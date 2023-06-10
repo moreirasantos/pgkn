@@ -25,10 +25,18 @@ kotlin {
                 entryPoint = "main"
             }
         }
+        val main by compilations.getting
+        val libpq by main.cinterops.creating {
+            defFile(project.file("src/nativeInterop/cinterop/libpq.def"))
+        }
     }
     sourceSets {
-        val nativeMain by getting
-        val nativeTest by getting
+        val commonMain by getting {
+            dependencies {
+                implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
+            }
+        }
+        val commonTest by getting
     }
 }
 
