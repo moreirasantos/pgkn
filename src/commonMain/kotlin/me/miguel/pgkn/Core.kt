@@ -157,25 +157,11 @@ sealed interface ResultSet {
      * {@code next} makes the first row the current row; the
      * second call makes the second row the current row, and so on.
      * <p>
-     * When a call to the {@code next} method returns {@code false},
-     * the cursor is positioned after the last row. Any
-     * invocation of a {@code ResultSet} method which requires a
-     * current row will result in a {@code SQLException} being thrown.
-     *  If the result set type is {@code TYPE_FORWARD_ONLY}, it is vendor specified
-     * whether their JDBC driver implementation will return {@code false} or
-     *  throw an {@code SQLException} on a
-     * subsequent call to {@code next}.
-     *
-     * <P>If an input stream is open for the current row, a call
-     * to the method {@code next} will
-     * implicitly close it. A {@code ResultSet} object's
-     * warning chain is cleared when a new row is read.
      *
      * @return {@code true} if the new current row is valid;
      * {@code false} if there are no more rows
      */
     fun next(): Boolean
-
 
     /**
      * Retrieves the value of the designated column in the current row
@@ -196,6 +182,8 @@ sealed interface ResultSet {
      * Retrieves the value of the designated column in the current row
      * of this `ResultSet` object as
      * a `Boolean` in the Kotlin programming language.
+     *
+     * // TODO: currently only checking "t"
      *
      * <P>If the designated column has a datatype of CHAR or VARCHAR
      * and contains a "0" or has a datatype of BIT, TINYINT, SMALLINT, INTEGER or BIGINT
