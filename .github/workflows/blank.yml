@@ -33,4 +33,4 @@ jobs:
         uses: Homebrew/actions/setup-homebrew@master
       - run: brew install libpq
       - run: gradle wrapper --no-daemon
-      - run: ./gradlew build --no-daemon
+      - run: ./gradlew build detekt --no-daemon
