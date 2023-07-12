@@ -9,7 +9,9 @@ import me.miguel.pgkn.resultset.PostgresResultSet
 import me.miguel.pgkn.resultset.ResultSet
 
 sealed interface PostgresDriver {
-    fun <T> executeQuery(sql: String, handler: (ResultSet) -> T): List<T>
+    fun <T> execute(sql: String, handler: (ResultSet) -> T): List<T>
+
+    fun execute(sql: String): Long
 }
 
 fun PostgresDriver(
@@ -44,7 +46,25 @@ private class PostgresDriverImpl(
         pgtty = null
     ).apply { require(ConnStatusType.CONNECTION_OK == PQstatus(this)) }!!
 
-    override fun <T> executeQuery(sql: String, handler: (ResultSet) -> T): List<T> = memScoped {
+    override fun <T> execute(sql: String, handler: (ResultSet) -> T): List<T> = doExecute(sql).let {
+        val rs = PostgresResultSet(it)
+
+        val list: MutableList<T> = mutableListOf()
+        while (rs.next()) {
+            list.add(handler(rs))
+        }
+
+        PQclear(it)
+        return list
+    }
+
+    override fun execute(sql: String): Long = doExecute(sql).let {
+        val rows = PQcmdTuples(it)!!.toKString()
+        PQclear(it)
+        return rows.toLongOrNull() ?: 0
+    }
+
+    private fun doExecute(sql: String) = memScoped {
         PQexecParams(
             connection,
             command = sql,
@@ -57,17 +77,6 @@ private class PostgresDriverImpl(
         )
     }
         .check()
-        .let {
-            val rs = PostgresResultSet(it)
-
-            val list: MutableList<T> = mutableListOf()
-            while (rs.next()) {
-                list.add(handler(rs))
-            }
-
-            PQclear(it)
-            return list
-        }
 
     private fun CPointer<PGresult>?.check(): CPointer<PGresult> {
         val status = PQresultStatus(this)

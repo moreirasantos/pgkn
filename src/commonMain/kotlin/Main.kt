@@ -10,7 +10,7 @@ fun main() {
         password = "postgres",
     )
 
-    val list = driver.executeQuery("SELECT * FROM users") {
+    val list = driver.execute("SELECT * FROM users") {
         mapOf(
             "id" to it.getLong(0),
             "name" to it.getString(1),
