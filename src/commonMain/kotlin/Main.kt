@@ -1,6 +1,7 @@
 import me.miguel.pgkn.PostgresDriver
 
 
+@Suppress("All")
 fun main() {
     val driver = PostgresDriver(
         host = "host.docker.internal",

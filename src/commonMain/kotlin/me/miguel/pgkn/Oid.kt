@@ -6,6 +6,7 @@ package me.miguel.pgkn
  * This list is the supported columns for binary, according to:
  * https://github.com/pgjdbc/pgjdbc/blob/master/pgjdbc/src/main/java/org/postgresql/jdbc/PgConnection.java#L393
  */
+@Suppress("UnusedPrivateProperty")
 private val supportedBinaryOids = hashSetOf(
     Oid.BYTEA,
     Oid.INT2,
@@ -32,6 +33,8 @@ private val supportedBinaryOids = hashSetOf(
     Oid.UUID
 )
 
+
+@Suppress("MagicNumber")
 enum class Oid(val value: Int) {
     UNSPECIFIED(0),
     INT2(21),
@@ -95,13 +98,13 @@ enum class Oid(val value: Int) {
     REF_CURSOR(1790),
     REF_CURSOR_ARRAY(2201);
 
-    private val OID_TO_NAME: MutableMap<Int, String> = mutableMapOf()
-    private val NAME_TO_OID: MutableMap<String, Int> = mutableMapOf()
+    private val oidToName: MutableMap<Int, String> = mutableMapOf()
+    private val nameToOid: MutableMap<String, Int> = mutableMapOf()
 
     init {
         Oid.values().forEach {
-            OID_TO_NAME[it.value] = it.name
-            NAME_TO_OID[it.name] = it.value
+            oidToName[it.value] = it.name
+            nameToOid[it.name] = it.value
         }
     }
 }

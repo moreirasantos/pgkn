@@ -2,11 +2,13 @@ import com.bmuschko.gradle.docker.tasks.container.DockerCreateContainer
 import com.bmuschko.gradle.docker.tasks.container.DockerRemoveContainer
 import com.bmuschko.gradle.docker.tasks.container.DockerStartContainer
 import com.bmuschko.gradle.docker.tasks.image.DockerPullImage
+import io.gitlab.arturbosch.detekt.Detekt
 
 plugins {
     val kotlinVersion = "1.8.21"
     kotlin("multiplatform") version kotlinVersion
     id("com.bmuschko.docker-remote-api") version "6.7.0"
+    id("io.gitlab.arturbosch.detekt").version("1.23.0")
 }
 
 group = "me.miguel"
@@ -90,6 +92,23 @@ tasks {
     val nativeTest by getting {
         dependsOn(start)
         finalizedBy(remove)
+    }
+}
+
+detekt {
+    buildUponDefaultConfig = true // preconfigure defaults
+    config.setFrom("$projectDir/config/detekt.yml")
+}
+
+tasks.withType<Detekt>().configureEach {
+    setSource(files(project.projectDir))
+    exclude("**/*.kts")
+    exclude("**/build/**")
+
+    reports {
+        jvmTarget = "17"
+        html.required.set(true) // observe findings in your browser with structure and code snippets
+        sarif.required.set(true) // standardized SARIF format (https://sarifweb.azurewebsites.net/)
     }
 }
 

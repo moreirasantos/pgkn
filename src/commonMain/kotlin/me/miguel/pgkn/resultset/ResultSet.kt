@@ -6,6 +6,7 @@ import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
 import me.miguel.pgkn.SQLException
 
+@Suppress("TooManyFunctions")
 sealed interface ResultSet {
 
     /**
@@ -57,7 +58,7 @@ sealed interface ResultSet {
      * if a database access error occurs or this method is
      * called on a closed result set
     </P> */
-
+    @Suppress("ForbiddenComment")
     fun getBoolean(columnIndex: Int): Boolean?
 
     /**
