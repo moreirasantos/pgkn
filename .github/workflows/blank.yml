@@ -29,6 +29,8 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
           cache: 'gradle'
+      - name: Set up Homebrew
+        uses: Homebrew/actions/setup-homebrew@master
       - run: brew install libpq
       - run: gradle wrapper --no-daemon
       - run: ./gradlew build --no-daemon
