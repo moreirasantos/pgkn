@@ -29,6 +29,6 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
           cache: 'gradle'
-      - run: apt-get install libpq-dev -y
+      - run: sudo apt-get install libpq-dev -y
       - run: gradle wrapper --no-daemon
       - run: ./gradlew build --no-daemon
