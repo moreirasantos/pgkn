@@ -11,11 +11,14 @@ import me.miguel.pgkn.SQLException
  * To Fix ISO 8601, as postgres default is space not "T"
  * https://www.postgresql.org/docs/current/datatype-datetime.html#DATATYPE-DATETIME-OUTPUT
  */
+@Suppress("MagicNumber")
 private fun String.fixIso8601() = replaceRange(10, 11, "T")
 
+@Suppress("TooManyFunctions")
 internal class PostgresResultSet(val internal: CPointer<PGresult>) : ResultSet {
 
     private val rowCount: Int = PQntuples(internal)
+    @Suppress("UnusedPrivateProperty")
     private val columnCount: Int = PQnfields(internal)
 
     private var currentRow = -1

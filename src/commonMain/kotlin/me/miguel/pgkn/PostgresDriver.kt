@@ -90,4 +90,5 @@ private class PostgresDriverImpl(
 private fun CPointer<PGconn>?.error(): String = PQerrorMessage(this)!!.toKString().also { PQfinish(this) }
 
 private const val TEXT_RESULT_FORMAT = 0
+@Suppress("UnusedPrivateProperty")
 private const val BINARY_RESULT_FORMAT = 1
