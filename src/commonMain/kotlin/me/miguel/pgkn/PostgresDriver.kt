@@ -1,9 +1,6 @@
 package me.miguel.pgkn
 
-import kotlinx.cinterop.CPointer
-import kotlinx.cinterop.createValues
-import kotlinx.cinterop.memScoped
-import kotlinx.cinterop.toKString
+import kotlinx.cinterop.*
 import libpq.*
 import me.miguel.pgkn.resultset.PostgresResultSet
 import me.miguel.pgkn.resultset.ResultSet
@@ -14,6 +11,7 @@ sealed interface PostgresDriver {
     fun execute(sql: String): Long
 }
 
+@OptIn(ExperimentalForeignApi::class)
 fun PostgresDriver(
     host: String,
     port: Int = 5432,
@@ -28,6 +26,7 @@ fun PostgresDriver(
     password = password
 )
 
+@ExperimentalForeignApi
 private class PostgresDriverImpl(
     host: String,
     port: Int,
@@ -87,6 +86,7 @@ private class PostgresDriverImpl(
     }
 }
 
+@ExperimentalForeignApi
 private fun CPointer<PGconn>?.error(): String = PQerrorMessage(this)!!.toKString().also { PQfinish(this) }
 
 private const val TEXT_RESULT_FORMAT = 0

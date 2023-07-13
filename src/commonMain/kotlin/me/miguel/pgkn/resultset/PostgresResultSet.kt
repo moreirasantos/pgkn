@@ -2,6 +2,7 @@ package me.miguel.pgkn.resultset
 
 import kotlinx.cinterop.ByteVar
 import kotlinx.cinterop.CPointer
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.toKString
 import kotlinx.datetime.*
 import libpq.*
@@ -15,6 +16,7 @@ import me.miguel.pgkn.SQLException
 private fun String.fixIso8601() = replaceRange(10, 11, "T")
 
 @Suppress("TooManyFunctions")
+@ExperimentalForeignApi
 internal class PostgresResultSet(val internal: CPointer<PGresult>) : ResultSet {
 
     private val rowCount: Int = PQntuples(internal)
