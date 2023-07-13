@@ -5,14 +5,15 @@ import com.bmuschko.gradle.docker.tasks.image.DockerPullImage
 import io.gitlab.arturbosch.detekt.Detekt
 
 plugins {
-    val kotlinVersion = "1.8.21"
+    val kotlinVersion = "1.9.0"
     kotlin("multiplatform") version kotlinVersion
     id("com.bmuschko.docker-remote-api") version "6.7.0"
     id("io.gitlab.arturbosch.detekt").version("1.23.0")
+    id("maven-publish")
 }
 
 group = "me.miguel"
-version = "1.0-SNAPSHOT"
+version = "1.0.0"
 
 repositories {
     mavenCentral()
@@ -28,11 +29,6 @@ kotlin {
     }
 
     nativeTarget.apply {
-        binaries {
-            executable {
-                entryPoint = "main"
-            }
-        }
         val main by compilations.getting
         val libpq by main.cinterops.creating {
             defFile(project.file("src/nativeInterop/cinterop/libpq.def"))
