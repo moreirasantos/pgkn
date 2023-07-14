@@ -1,4 +1,4 @@
-package me.miguel.pgkn.resultset
+package io.github.miguelmoreira.pgkn.resultset
 
 import kotlinx.cinterop.ByteVar
 import kotlinx.cinterop.CPointer
@@ -6,7 +6,7 @@ import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.toKString
 import kotlinx.datetime.*
 import libpq.*
-import me.miguel.pgkn.SQLException
+import io.github.miguelmoreira.pgkn.SQLException
 
 /**
  * To Fix ISO 8601, as postgres default is space not "T"

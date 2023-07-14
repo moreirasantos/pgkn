@@ -1,9 +1,9 @@
-package me.miguel.pgkn
+package io.github.miguelmoreira.pgkn
 
 import kotlinx.cinterop.*
 import libpq.*
-import me.miguel.pgkn.resultset.PostgresResultSet
-import me.miguel.pgkn.resultset.ResultSet
+import io.github.miguelmoreira.pgkn.resultset.PostgresResultSet
+import io.github.miguelmoreira.pgkn.resultset.ResultSet
 
 sealed interface PostgresDriver {
     fun <T> execute(sql: String, handler: (ResultSet) -> T): List<T>

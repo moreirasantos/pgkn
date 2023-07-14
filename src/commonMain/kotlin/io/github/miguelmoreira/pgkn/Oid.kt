@@ -1,4 +1,4 @@
-package me.miguel.pgkn
+package io.github.miguelmoreira.pgkn
 
 
 /**

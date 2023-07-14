@@ -12,7 +12,7 @@ plugins {
     id("maven-publish")
 }
 
-group = "me.miguel"
+group = "io.github.moreirasantos"
 version = "1.0.0"
 
 repositories {
