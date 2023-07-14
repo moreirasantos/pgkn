@@ -9,7 +9,7 @@ plugins {
     kotlin("multiplatform") version kotlinVersion
     id("com.bmuschko.docker-remote-api") version "6.7.0"
     id("io.gitlab.arturbosch.detekt").version("1.23.0")
-    id("maven-publish")
+    id("convention.publication")
 }
 
 group = "io.github.moreirasantos"
@@ -105,6 +105,13 @@ tasks.withType<Detekt>().configureEach {
         jvmTarget = "17"
         html.required.set(true) // observe findings in your browser with structure and code snippets
         sarif.required.set(true) // standardized SARIF format (https://sarifweb.azurewebsites.net/)
+    }
+}
+
+tasks{
+    val publishNativePublicationToSonatypeRepository by getting {
+        // Explicit dependency because gradle says it's implicit and fails build
+        dependsOn("signKotlinMultiplatformPublication")
     }
 }
 
