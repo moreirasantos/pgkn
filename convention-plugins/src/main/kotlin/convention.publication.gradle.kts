@@ -1,7 +1,3 @@
-import org.gradle.api.publish.maven.MavenPublication
-import org.gradle.api.tasks.bundling.Jar
-import org.gradle.kotlin.dsl.`maven-publish`
-import org.gradle.kotlin.dsl.signing
 import java.util.*
 
 plugins {
@@ -92,6 +88,6 @@ signing {
 tasks{
     val publishKotlinMultiplatformPublicationToSonatypeRepository by getting {
         // Explicit dependency because gradle says it's implicit and fails build
-        dependsOn("signNativePublication")
+        dependsOn("signLinuxX64Publication")
     }
 }

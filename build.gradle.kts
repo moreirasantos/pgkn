@@ -13,31 +13,39 @@ plugins {
 }
 
 group = "io.github.moreirasantos"
-version = "1.0.0"
+version = "1.0.1"
 
 repositories {
     mavenCentral()
 }
 kotlin {
-    val hostOs = System.getProperty("os.name")
-    val isMingwX64 = hostOs.startsWith("Windows")
-    val nativeTarget = when {
-        hostOs == "Mac OS X" -> macosX64("native")
-        hostOs == "Linux" -> linuxX64("native")
-        isMingwX64 -> mingwX64("native")
-        else -> throw GradleException("Host OS is not supported in Kotlin/Native.")
-    }
-
-    nativeTarget.apply {
+    // Tiers are in accordance with <https://kotlinlang.org/docs/native-target-support.html>
+    // Tier 1
+    linuxX64 {
         val main by compilations.getting
         val libpq by main.cinterops.creating {
             defFile(project.file("src/nativeInterop/cinterop/libpq.def"))
         }
     }
+    /*
+    // Currently unsupported
+    // Tier 2
+    linuxArm64("linuxArm64")
+    // Tier 3
+    mingwX64("mingwX64")
+
+    // Tier 1
+    macosX64("macosX64")
+    macosArm64("macosArm64")
+    */
+
+    // android, ios, watchos, tvos, jvm, js will never(?) be supported
+
     sourceSets {
         val commonMain by getting {
             dependencies {
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
+                implementation("io.github.oshai:kotlin-logging-linuxx64:5.0.0-beta-04")
             }
         }
         val commonTest by getting
@@ -85,7 +93,7 @@ val remove by tasks.registering(DockerRemoveContainer::class) {
 }
 
 tasks {
-    val nativeTest by getting {
+    val linuxX64Test by existing {
         dependsOn(start)
         finalizedBy(remove)
     }
@@ -109,7 +117,7 @@ tasks.withType<Detekt>().configureEach {
 }
 
 tasks{
-    val publishNativePublicationToSonatypeRepository by getting {
+    val publishLinuxX64PublicationToSonatypeRepository by getting {
         // Explicit dependency because gradle says it's implicit and fails build
         dependsOn("signKotlinMultiplatformPublication")
     }

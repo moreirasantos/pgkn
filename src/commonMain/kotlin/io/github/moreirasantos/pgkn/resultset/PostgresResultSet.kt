@@ -1,12 +1,16 @@
-package io.github.miguelmoreira.pgkn.resultset
+package io.github.moreirasantos.pgkn.resultset
 
+import io.github.moreirasantos.pgkn.KLogger
+import io.github.moreirasantos.pgkn.PgknMarker
+import io.github.moreirasantos.pgkn.SQLException
 import kotlinx.cinterop.ByteVar
 import kotlinx.cinterop.CPointer
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.toKString
 import kotlinx.datetime.*
 import libpq.*
-import io.github.miguelmoreira.pgkn.SQLException
+
+private val logger = KLogger("io.github.moreirasantos.pgkn.resultset.PostgresResultSetKt")
 
 /**
  * To Fix ISO 8601, as postgres default is space not "T"
@@ -20,6 +24,7 @@ private fun String.fixIso8601() = replaceRange(10, 11, "T")
 internal class PostgresResultSet(val internal: CPointer<PGresult>) : ResultSet {
 
     private val rowCount: Int = PQntuples(internal)
+
     @Suppress("UnusedPrivateProperty")
     private val columnCount: Int = PQnfields(internal)
 
@@ -47,7 +52,10 @@ internal class PostgresResultSet(val internal: CPointer<PGresult>) : ResultSet {
      * Are all non-binary columns returned as text?
      * https://www.postgresql.org/docs/9.5/libpq-exec.html#LIBPQ-EXEC-SELECT-INFO
      */
-    override fun getString(columnIndex: Int): String? = getPointer(columnIndex)?.toKString().also { println(it) }
+    override fun getString(columnIndex: Int): String? = getPointer(columnIndex)?.toKString()
+        .also {
+            logger.trace { "Value of column $columnIndex: $it" }
+        }
 
     override fun getBoolean(columnIndex: Int): Boolean? = getString(columnIndex)?.equals("t")
 
