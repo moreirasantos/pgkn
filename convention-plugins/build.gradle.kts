@@ -1,3 +1,5 @@
+// Use by running: ./gradlew clean publishAllPublicationsToSonatypeRepository
+
 plugins {
     `kotlin-dsl` // Is needed to turn our build logic written in Kotlin into the Gradle Plugin
 }

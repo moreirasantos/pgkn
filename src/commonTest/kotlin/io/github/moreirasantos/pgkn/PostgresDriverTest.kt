@@ -1,7 +1,7 @@
-package io.github.miguelmoreira.pgkn
+package io.github.moreirasantos.pgkn
 
 import kotlinx.datetime.*
-import io.github.miguelmoreira.pgkn.resultset.ResultSet
+import io.github.moreirasantos.pgkn.resultset.ResultSet
 import kotlin.test.Test
 import kotlin.test.assertContains
 import kotlin.test.assertEquals

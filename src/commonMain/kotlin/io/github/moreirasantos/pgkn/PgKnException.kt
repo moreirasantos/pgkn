@@ -1,4 +1,4 @@
 @file:Suppress("MatchingDeclarationName")
-package io.github.miguelmoreira.pgkn
+package io.github.moreirasantos.pgkn
 
 class SQLException : Exception()
