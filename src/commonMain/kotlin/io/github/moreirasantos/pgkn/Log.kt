@@ -4,11 +4,11 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import io.github.oshai.kotlinlogging.Marker
 import io.github.oshai.kotlinlogging.KLogger as ActualKLogger
 
-object PgknMarker : Marker {
+internal object PgknMarker : Marker {
     override fun getName() = "PGKN"
 }
 
-class KLogger(private val actualKLogger: ActualKLogger) : ActualKLogger by actualKLogger {
+internal class KLogger(private val actualKLogger: ActualKLogger) : ActualKLogger by actualKLogger {
     constructor(name: String) : this(KotlinLogging.logger(name))
 
     override fun trace(message: () -> Any?) = trace(null as Throwable?, PgknMarker, message)
