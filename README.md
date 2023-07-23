@@ -5,16 +5,14 @@
 [![Maven Central](https://img.shields.io/maven-central/v/io.github.moreirasantos/pgkn)](https://central.sonatype.com/artifact/io.github.moreirasantos/pgkn/)
 [![Kotlin](https://img.shields.io/badge/kotlin-1.9.0-blue.svg?logo=kotlin)](http://kotlinlang.org)
 
-
 # pgkn
 PostgreSQL Kotlin/Native Driver
 
 ## Usage
 ```
-// Show full structure of a kotlin native project
 implementation("io.github.moreirasantos:pgkn:1.0.0")
 ```
-```
+```kotlin
 fun main() {
     val driver = PostgresDriver(
         host = "host.docker.internal",
@@ -44,3 +42,19 @@ fun main() {
     }
 }
 ```
+## Features
+## Named Parameters
+```kotlin
+driver.execute(
+    "select name from my_table where name = :one OR email = :other",
+    mapOf("one" to "your_name", "other" to "your@email.com")
+) { it.getString(0) }
+```
+Named Parameters provides an alternative to the traditional syntax using `?` to specify parameters.
+Under the hood, it substitutes the named parameters to a query placeholder.
+
+In JDBC, the placeholder would be `?` but with libpq, we will pass `$1`, `$2`, etc as stated here:
+[31.3.1. Main Functions - PQexecParams](https://www.postgresql.org/docs/9.5/libpq-exec.html)
+
+This feature implementation tries to follow Spring's `NamedParameterJdbcTemplate` as close as possible.
+[NamedParameterJdbcTemplate](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/jdbc/core/namedparam/NamedParameterJdbcTemplate.html)
