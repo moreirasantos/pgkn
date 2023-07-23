@@ -141,6 +141,13 @@ class PostgresDriverTest {
             })"
         )
 
+        //TODO Make test
+        println(driver.execute("select * from all_types where name = :asd OR name = :dfgdfg", mapOf("asd" to "name", "dfgdfg" to "123123")) {
+            println(it.getLong(0))
+            println(it.getString(1))
+            println(it.getString(2))
+        })
+
         list
             .asSequence()
             .filter { it.value !is ByteArray }
