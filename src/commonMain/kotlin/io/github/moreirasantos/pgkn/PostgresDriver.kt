@@ -82,9 +82,7 @@ private class PostgresDriverImpl(
     private fun doExecute(sql: String, paramSource: SqlParameterSource): CPointer<PGresult> {
         val parsedSql = parseSql(sql)
         val sqlToUse: String = substituteNamedParameters(parsedSql, paramSource)
-        // We may not need this since we could infer type from class name?
-        // val declaredParameters: List<SqlParameter> = buildSqlParameterList(parsedSql, paramSource)
-        val params: Array<Any?> = buildValueArray(parsedSql, paramSource, null)
+        val params: Array<Any?> = buildValueArray(parsedSql, paramSource)
 
         return memScoped {
             PQexecParams(
@@ -97,9 +95,7 @@ private class PostgresDriverImpl(
                 },
                 paramLengths = params.map { it?.toString()?.length ?: 0 }.toIntArray().refTo(0),
                 paramFormats = IntArray(params.size) { TEXT_RESULT_FORMAT }.refTo(0),
-                paramTypes = params.map {
-                    oidMap[it!!::class.simpleName]!!/*it.sqlType.toUInt()*/
-                }.toUIntArray().refTo(0),
+                paramTypes = parsedSql.parameterNames.map(paramSource::getSqlType).toUIntArray().refTo(0),
                 resultFormat = TEXT_RESULT_FORMAT
             )
         }.check()
@@ -135,19 +131,3 @@ private const val TEXT_RESULT_FORMAT = 0
 
 @Suppress("UnusedPrivateProperty")
 private const val BINARY_RESULT_FORMAT = 1
-
-
-private val oidMap: Map<String?, UInt> = hashMapOf(
-    Boolean::class.simpleName to 16u,
-    ByteArray::class.simpleName to 17u,
-    Long::class.simpleName to 20u,
-    Int::class.simpleName to 20u, // TODO this is long not int
-    String::class.simpleName to 25u,
-    Double::class.simpleName to 701u,
-    LocalDate::class.simpleName to 1082u,
-    LocalTime::class.simpleName to 1083u,
-    // intervalOid = 1186u
-    LocalDateTime::class.simpleName to 1114u,
-    Instant::class.simpleName to 1184u,
-    // uuidOid = 2950u
-).withDefault { throw IllegalArgumentException("Wrong Type $it") }

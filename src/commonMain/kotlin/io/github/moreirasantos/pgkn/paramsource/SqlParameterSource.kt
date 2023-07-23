@@ -36,9 +36,7 @@ interface SqlParameterSource {
      * or `TYPE_UNKNOWN` if not known
      * @see .TYPE_UNKNOWN
      */
-    fun getSqlType(paramName: String): Int {
-        return TYPE_UNKNOWN
-    }
+    fun getSqlType(paramName: String) = TYPE_UNKNOWN
 
     /**
      * Determine the type name for the specified named parameter.
@@ -61,7 +59,8 @@ interface SqlParameterSource {
          * @see getSqlType
          *
          */
-        val TYPE_UNKNOWN: Int = Int.MIN_VALUE
+        val TYPE_UNKNOWN: UInt = UInt.MIN_VALUE
+        // TODO check if libpq has a default param type oid
     }
 }
 

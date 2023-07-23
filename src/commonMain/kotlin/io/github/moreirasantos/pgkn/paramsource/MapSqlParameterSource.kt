@@ -1,6 +1,6 @@
 package io.github.moreirasantos.pgkn.paramsource
 
-import io.github.moreirasantos.pgkn.sql.SqlParameterValue
+import io.github.moreirasantos.pgkn.SQLException
 
 
 /**
@@ -13,24 +13,6 @@ import io.github.moreirasantos.pgkn.sql.SqlParameterValue
  */
 class MapSqlParameterSource : AbstractSqlParameterSource {
     private val values: MutableMap<String, Any?> = LinkedHashMap()
-
-    /**
-     * Create an empty MapSqlParameterSource,
-     * with values to be added via `addValue`.
-     * @see .addValue
-     */
-    constructor()
-
-    /**
-     * Create a new MapSqlParameterSource, with one value
-     * comprised of the supplied arguments.
-     * @param paramName the name of the parameter
-     * @param value the value of the parameter
-     * @see .addValue
-     */
-    constructor(paramName: String, value: Any) {
-        addValue(paramName, value)
-    }
 
     /**
      * Create a new MapSqlParameterSource based on a Map.
@@ -47,11 +29,9 @@ class MapSqlParameterSource : AbstractSqlParameterSource {
      * @return a reference to this parameter source,
      * so it's possible to chain several calls together
      */
-    fun addValue(paramName: String, value: Any): MapSqlParameterSource {
+    fun addValue(paramName: String, value: Any?): MapSqlParameterSource {
         this.values[paramName] = value
-        if (value is SqlParameterValue) {
-            registerSqlType(paramName, value.sqlType)
-        }
+        registerSqlType(paramName, value)
         return this
     }
 
@@ -63,9 +43,9 @@ class MapSqlParameterSource : AbstractSqlParameterSource {
      * @return a reference to this parameter source,
      * so it's possible to chain several calls together
      */
-    fun addValue(paramName: String, value: Any?, sqlType: Int): MapSqlParameterSource {
+    fun addValue(paramName: String, value: Any?, sqlType: UInt): MapSqlParameterSource {
         this.values[paramName] = value
-        registerSqlType(paramName, sqlType)
+        registerSqlType(paramName = paramName, sqlType = sqlType)
         return this
     }
 
@@ -78,9 +58,9 @@ class MapSqlParameterSource : AbstractSqlParameterSource {
      * @return a reference to this parameter source,
      * so it's possible to chain several calls together
      */
-    fun addValue(paramName: String, value: Any?, sqlType: Int, typeName: String?): MapSqlParameterSource {
+    fun addValue(paramName: String, value: Any?, sqlType: UInt, typeName: String?): MapSqlParameterSource {
         this.values[paramName] = value
-        registerSqlType(paramName, sqlType)
+        registerSqlType(paramName = paramName, sqlType = sqlType)
         registerTypeName(paramName, typeName!!)
         return this
     }
@@ -94,9 +74,7 @@ class MapSqlParameterSource : AbstractSqlParameterSource {
     fun addValues(values: Map<String, Any?>?): MapSqlParameterSource {
         values?.forEach { (key, value) ->
             this.values[key] = value
-            if (value is SqlParameterValue) {
-                registerSqlType(key, value.sqlType)
-            }
+            registerSqlType(paramName = key, value = value)
         }
         return this
     }

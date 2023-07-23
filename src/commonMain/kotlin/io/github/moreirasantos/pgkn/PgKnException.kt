@@ -2,8 +2,6 @@
 
 package io.github.moreirasantos.pgkn
 
-open class SQLException(message: String?) : Exception(message) {
-    constructor() : this(null)
-}
+open class SQLException(message: String? = null, cause: Throwable? = null) : Exception(message, cause)
 
-class InvalidDataAccessApiUsageException(message: String) : SQLException(message)
+class InvalidDataAccessApiUsageException(message: String, cause: Throwable? = null) : SQLException(message, cause)

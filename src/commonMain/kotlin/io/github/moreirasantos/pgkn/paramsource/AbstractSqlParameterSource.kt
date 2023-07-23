@@ -1,7 +1,12 @@
 package io.github.moreirasantos.pgkn.paramsource
 
+import io.github.moreirasantos.pgkn.SQLException
 import io.github.moreirasantos.pgkn.paramsource.SqlParameterSource.Companion.TYPE_UNKNOWN
-import io.github.moreirasantos.pgkn.sql.SqlTypes
+import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.LocalTime
+import kotlin.reflect.KClass
 
 
 /**
@@ -13,7 +18,7 @@ import io.github.moreirasantos.pgkn.sql.SqlTypes
  *
  */
 abstract class AbstractSqlParameterSource : SqlParameterSource {
-    private val sqlTypes: MutableMap<String, Int> = HashMap()
+    private val sqlTypes: MutableMap<String, UInt> = HashMap()
     private val typeNames: MutableMap<String, String> = HashMap()
 
     /**
@@ -21,8 +26,16 @@ abstract class AbstractSqlParameterSource : SqlParameterSource {
      * @param paramName the name of the parameter
      * @param sqlType the SQL type of the parameter
      */
-    fun registerSqlType(paramName: String, sqlType: Int) {
+    fun registerSqlType(paramName: String, sqlType: UInt) {
         sqlTypes[paramName] = sqlType
+    }
+
+    fun registerSqlType(paramName: String, value: Any?) {
+        registerSqlType(
+            paramName = paramName,
+            sqlType = value?.let { oidMap[it::class.simpleName ?: throw SQLException("Class must not be anonymous")] }
+                ?: TYPE_UNKNOWN
+        )
     }
 
     /**
@@ -96,5 +109,21 @@ abstract class AbstractSqlParameterSource : SqlParameterSource {
     }
 }
 
-private val sqlTypeNames: Map<Int, String> = SqlTypes.entries.associate { it.value to it.name }
+private val oidMap: Map<String, UInt> = hashMapOf(
+    Boolean::class.namedClassName to 16u,
+    ByteArray::class.namedClassName to 17u,
+    Long::class.namedClassName to 20u,
+    Int::class.namedClassName to 20u, // TODO this is long not int
+    String::class.namedClassName to 25u,
+    Double::class.namedClassName to 701u,
+    LocalDate::class.namedClassName to 1082u,
+    LocalTime::class.namedClassName to 1083u,
+    LocalDateTime::class.namedClassName to 1114u,
+    Instant::class.namedClassName to 1184u,
+    // intervalOid = 1186u
+    // uuidOid = 2950u
+)
 
+private val sqlTypeNames: Map<UInt, String> = oidMap.entries.associateBy({ it.value }) { it.key }
+
+private val KClass<*>.namedClassName get() = this.simpleName!!
