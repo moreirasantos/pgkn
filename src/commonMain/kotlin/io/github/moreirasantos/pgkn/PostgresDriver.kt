@@ -15,11 +15,8 @@ import kotlinx.datetime.LocalTime
 import libpq.*
 
 sealed interface PostgresDriver {
-    fun <T> execute(sql: String, handler: (ResultSet) -> T): List<T>
-    fun <T> execute(sql: String, namedParameters: Map<String, Any?>, handler: (ResultSet) -> T): List<T>
-
-    fun execute(sql: String): Long
-    fun execute(sql: String, namedParameters: Map<String, Any?>): Long
+    fun <T> execute(sql: String, namedParameters: Map<String, Any?> = emptyMap(), handler: (ResultSet) -> T): List<T>
+    fun execute(sql: String, namedParameters: Map<String, Any?> = emptyMap()): Long
 }
 
 @OptIn(ExperimentalForeignApi::class)
@@ -56,50 +53,31 @@ private class PostgresDriverImpl(
         pgtty = null
     ).apply { require(ConnStatusType.CONNECTION_OK == PQstatus(this)) }!!
 
-    override fun <T> execute(sql: String, handler: (ResultSet) -> T): List<T> = doExecute(sql).let {
-        val rs = PostgresResultSet(it)
+    override fun <T> execute(sql: String, namedParameters: Map<String, Any?>, handler: (ResultSet) -> T) =
+        if (namedParameters.isEmpty()) doExecute(sql).handleResults(handler)
+        else doExecute(sql, MapSqlParameterSource(namedParameters)).handleResults(handler)
+
+    override fun execute(sql: String, namedParameters: Map<String, Any?>) =
+        if (namedParameters.isEmpty()) doExecute(sql).returnCount()
+        else doExecute(sql, MapSqlParameterSource(namedParameters)).returnCount()
+
+    private fun <T> CPointer<PGresult>.handleResults(handler: (ResultSet) -> T): List<T> {
+        val rs = PostgresResultSet(this)
 
         val list: MutableList<T> = mutableListOf()
         while (rs.next()) {
             list.add(handler(rs))
         }
 
-        PQclear(it)
+        PQclear(this)
         return list
     }
 
-    override fun <T> execute(sql: String, namedParameters: Map<String, Any?>, handler: (ResultSet) -> T): List<T> =
-        execute(sql, MapSqlParameterSource(namedParameters), handler)
-
-    fun <T> execute(sql: String, paramSource: SqlParameterSource, handler: (ResultSet) -> T): List<T> =
-        doExecute(sql, paramSource)
-            .let {
-                val rs = PostgresResultSet(it)
-
-                val list: MutableList<T> = mutableListOf()
-                while (rs.next()) {
-                    list.add(handler(rs))
-                }
-
-                PQclear(it)
-                list
-            }
-
-    override fun execute(sql: String): Long = doExecute(sql).let {
-        val rows = PQcmdTuples(it)!!.toKString()
-        PQclear(it)
+    private fun CPointer<PGresult>.returnCount(): Long {
+        val rows = PQcmdTuples(this)!!.toKString()
+        PQclear(this)
         return rows.toLongOrNull() ?: 0
     }
-
-    override fun execute(sql: String, namedParameters: Map<String, Any?>) =
-        execute(sql, MapSqlParameterSource(namedParameters))
-
-    fun execute(sql: String, paramSource: SqlParameterSource): Long = doExecute(sql, paramSource)
-        .let {
-            val rows = PQcmdTuples(it)!!.toKString()
-            PQclear(it)
-            rows.toLongOrNull() ?: 0
-        }
 
     private fun doExecute(sql: String, paramSource: SqlParameterSource): CPointer<PGresult> {
         val parsedSql = parseSql(sql)

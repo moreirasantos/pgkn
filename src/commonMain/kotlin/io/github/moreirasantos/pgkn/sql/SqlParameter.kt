@@ -28,7 +28,7 @@ internal fun buildSqlParameterList(parsedSql: ParsedSql, paramSource: SqlParamet
  * be built into the value array in the form of SqlParameterValue objects.
  * @return the array of values
  */
-@Suppress("NestedBlockDepth")
+@Suppress("NestedBlockDepth", "SwallowedException")
 internal fun buildValueArray(
     parsedSql: ParsedSql,
     paramSource: SqlParameterSource,
@@ -73,6 +73,7 @@ internal fun buildValueArray(
  * @param paramIndex the index of the desired parameter
  * @return the declared SqlParameter, or `null` if none found
  */
+@Suppress("ReturnCount")
 private fun findParameter(
     declaredParams: List<SqlParameter>?,
     paramName: String,

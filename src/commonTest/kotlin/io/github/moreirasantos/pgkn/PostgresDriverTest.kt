@@ -8,8 +8,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 
 class PostgresDriverTest {
-
-    private val driver = PostgresDriver(
+    val driver = PostgresDriver(
         host = "localhost",
         port = 5678,
         database = "postgres",
@@ -140,13 +139,6 @@ class PostgresDriverTest {
                 list.joinToString(separator = ", ") { it.insertValue.toString() }
             })"
         )
-
-        //TODO Make test
-        println(driver.execute("select * from all_types where name = :asd OR name = :dfgdfg", mapOf("asd" to "name", "dfgdfg" to "123123")) {
-            println(it.getLong(0))
-            println(it.getString(1))
-            println(it.getString(2))
-        })
 
         list
             .asSequence()
