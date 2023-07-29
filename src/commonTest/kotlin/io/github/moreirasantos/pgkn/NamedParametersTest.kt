@@ -12,8 +12,8 @@ class NamedParametersTest {
         password = "postgres",
     )
 
-    private val createTable = """
-        create table named_params
+    private fun createTable(name: String) = """
+        create table $name
         (
             id integer not null constraint id primary key,
             name         text,
@@ -24,28 +24,52 @@ class NamedParametersTest {
 
     @Test
     fun `should select with named params`() {
-        driver.execute("drop table if exists named_params")
-        driver.execute(createTable)
-        assertEquals(0, driver.execute("select * from named_params") {}.size)
+        val t = "named_params"
+        driver.execute("drop table if exists $t")
+        driver.execute(createTable(t))
+        assertEquals(0, driver.execute("select * from $t") {}.size)
 
-        driver.execute("insert into named_params(id, name, email, int) values(1, 'john', 'mail@mail.com', 10)")
+        driver.execute("insert into $t(id, name, email, int) values(1, 'john', 'mail@mail.com', 10)")
 
         assertEquals(listOf("john"), driver.execute(
-            "select name from named_params where name = :one",
+            "select name from $t where name = :one",
             mapOf("one" to "john")
         ) { it.getString(0) })
 
         assertEquals(listOf("john"), driver.execute(
-            "select name from named_params where name = :one OR name = :other",
+            "select name from $t where name = :one OR name = :other",
             mapOf("one" to "john", "other" to "another")
         ) { it.getString(0) })
 
         assertEquals(emptyList(), driver.execute(
-            "select name from named_params where name = :one",
+            "select name from $t where name = :one",
             mapOf("one" to "wrong")
         ) { it.getString(0) })
 
+        driver.execute("drop table $t")
+    }
 
-        driver.execute("drop table named_params")
+    @Test
+    fun `should update with named params`() {
+        val t = "named_params_update"
+        driver.execute("drop table if exists $t")
+        driver.execute(createTable(t))
+        assertEquals(0, driver.execute("select * from $t") {}.size)
+
+        driver.execute("insert into $t(id, name, email, int) values(1, 'john', 'mail@mail.com', 10)")
+
+        assertEquals(
+            1, driver.execute(
+                "update $t set int = :number where name = :one",
+                mapOf("one" to "john", "number" to 15)
+            )
+        )
+
+        assertEquals(listOf("john"), driver.execute(
+            "select name from $t where int = :number",
+            mapOf("number" to 15)
+        ) { it.getString(0) })
+
+        driver.execute("drop table $t")
     }
 }
