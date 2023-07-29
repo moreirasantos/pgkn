@@ -8,8 +8,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 
 class PostgresDriverTest {
-
-    private val driver = PostgresDriver(
+    val driver = PostgresDriver(
         host = "localhost",
         port = 5678,
         database = "postgres",

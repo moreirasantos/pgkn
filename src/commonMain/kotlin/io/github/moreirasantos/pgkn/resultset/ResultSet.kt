@@ -1,10 +1,10 @@
 package io.github.moreirasantos.pgkn.resultset
 
+import io.github.moreirasantos.pgkn.exception.SQLException
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
-import io.github.moreirasantos.pgkn.SQLException
 
 @Suppress("TooManyFunctions")
 sealed interface ResultSet {

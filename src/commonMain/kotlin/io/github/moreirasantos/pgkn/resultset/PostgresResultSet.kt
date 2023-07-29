@@ -1,8 +1,7 @@
 package io.github.moreirasantos.pgkn.resultset
 
 import io.github.moreirasantos.pgkn.KLogger
-import io.github.moreirasantos.pgkn.PgknMarker
-import io.github.moreirasantos.pgkn.SQLException
+import io.github.moreirasantos.pgkn.exception.GetColumnValueException
 import kotlinx.cinterop.ByteVar
 import kotlinx.cinterop.CPointer
 import kotlinx.cinterop.ExperimentalForeignApi
@@ -44,9 +43,9 @@ internal class PostgresResultSet(val internal: CPointer<PGresult>) : ResultSet {
 
     private fun getPointer(columnIndex: Int): CPointer<ByteVar>? {
         if (isNull(columnIndex)) return null
-        return PQgetvalue(res = internal, tup_num = currentRow, field_num = columnIndex) ?: throw SQLException()
+        return PQgetvalue(res = internal, tup_num = currentRow, field_num = columnIndex)
+            ?: throw GetColumnValueException(columnIndex)
     }
-
 
     /**
      * Are all non-binary columns returned as text?
