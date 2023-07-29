@@ -1,6 +1,6 @@
 package io.github.moreirasantos.pgkn.sql
 
-import io.github.moreirasantos.pgkn.InvalidDataAccessApiUsageException
+import io.github.moreirasantos.pgkn.exception.InvalidDataAccessApiUsageException
 
 
 /**

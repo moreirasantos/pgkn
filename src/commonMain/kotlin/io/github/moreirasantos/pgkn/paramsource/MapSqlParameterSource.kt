@@ -1,7 +1,5 @@
 package io.github.moreirasantos.pgkn.paramsource
 
-import io.github.moreirasantos.pgkn.SQLException
-
 
 /**
  * [SqlParameterSource] implementation that holds a given Map of parameters.

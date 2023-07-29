@@ -1,6 +1,6 @@
 package io.github.moreirasantos.pgkn.paramsource
 
-import io.github.moreirasantos.pgkn.SQLException
+import io.github.moreirasantos.pgkn.exception.AnonymousClassException
 import io.github.moreirasantos.pgkn.paramsource.SqlParameterSource.Companion.TYPE_UNKNOWN
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
@@ -33,7 +33,7 @@ abstract class AbstractSqlParameterSource : SqlParameterSource {
     fun registerSqlType(paramName: String, value: Any?) {
         registerSqlType(
             paramName = paramName,
-            sqlType = value?.let { oidMap[it::class.simpleName ?: throw SQLException("Class must not be anonymous")] }
+            sqlType = value?.let { oidMap[it::class.simpleName ?: throw AnonymousClassException()] }
                 ?: TYPE_UNKNOWN
         )
     }
