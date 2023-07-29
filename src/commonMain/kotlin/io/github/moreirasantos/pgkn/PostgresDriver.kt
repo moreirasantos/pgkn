@@ -8,15 +8,18 @@ import io.github.moreirasantos.pgkn.sql.buildValueArray
 import io.github.moreirasantos.pgkn.sql.parseSql
 import io.github.moreirasantos.pgkn.sql.substituteNamedParameters
 import kotlinx.cinterop.*
-import kotlinx.datetime.Instant
-import kotlinx.datetime.LocalDate
-import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.LocalTime
 import libpq.*
 
+/**
+ * Executes given query with given named parameters.
+ * If you pass a handler, you will receive a list of result data.
+ * You can pass an [SqlParameterSource] to register your own Postgres types.
+ */
 sealed interface PostgresDriver {
     fun <T> execute(sql: String, namedParameters: Map<String, Any?> = emptyMap(), handler: (ResultSet) -> T): List<T>
+    fun <T> execute(sql: String, paramSource: SqlParameterSource, handler: (ResultSet) -> T): List<T>
     fun execute(sql: String, namedParameters: Map<String, Any?> = emptyMap()): Long
+    fun execute(sql: String, paramSource: SqlParameterSource): Long
 }
 
 @OptIn(ExperimentalForeignApi::class)
@@ -55,11 +58,17 @@ private class PostgresDriverImpl(
 
     override fun <T> execute(sql: String, namedParameters: Map<String, Any?>, handler: (ResultSet) -> T) =
         if (namedParameters.isEmpty()) doExecute(sql).handleResults(handler)
-        else doExecute(sql, MapSqlParameterSource(namedParameters)).handleResults(handler)
+        else execute(sql, MapSqlParameterSource(namedParameters), handler)
+
+    override fun <T> execute(sql: String, paramSource: SqlParameterSource, handler: (ResultSet) -> T) =
+        doExecute(sql, paramSource).handleResults(handler)
 
     override fun execute(sql: String, namedParameters: Map<String, Any?>) =
         if (namedParameters.isEmpty()) doExecute(sql).returnCount()
-        else doExecute(sql, MapSqlParameterSource(namedParameters)).returnCount()
+        else execute(sql, MapSqlParameterSource(namedParameters))
+
+    override fun execute(sql: String, paramSource: SqlParameterSource) =
+        doExecute(sql, paramSource).returnCount()
 
     private fun <T> CPointer<PGresult>.handleResults(handler: (ResultSet) -> T): List<T> {
         val rs = PostgresResultSet(this)
@@ -101,7 +110,6 @@ private class PostgresDriverImpl(
         }.check()
     }
 
-    @Suppress("LongParameterList")
     private fun doExecute(sql: String) = memScoped {
         PQexecParams(
             connection,

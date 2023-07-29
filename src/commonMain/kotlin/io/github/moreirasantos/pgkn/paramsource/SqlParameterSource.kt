@@ -8,9 +8,6 @@ package io.github.moreirasantos.pgkn.paramsource
  * to parameter values. All parameter values and types are identified by
  * specifying the name of the parameter.
  *
- *
- * Intended to wrap various implementations like a Map or a JavaBean
- * with a consistent interface.
  */
 interface SqlParameterSource {
     /**

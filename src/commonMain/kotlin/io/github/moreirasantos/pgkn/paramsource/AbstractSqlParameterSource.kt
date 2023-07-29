@@ -12,10 +12,8 @@ import kotlin.reflect.KClass
 /**
  * Abstract base class for [SqlParameterSource] implementations.
  * Provides registration of SQL types per parameter and a friendly
- * [toString][.toString] representation enumerating all parameters for
- * a `SqlParameterSource` implementing [.getParameterNames].
- * Concrete subclasses must implement [.hasValue] and [.getValue].
- *
+ * [toString] representation.
+ * Concrete subclasses must implement [hasValue] and [getValue].
  */
 abstract class AbstractSqlParameterSource : SqlParameterSource {
     private val sqlTypes: MutableMap<String, UInt> = HashMap()
@@ -109,11 +107,12 @@ abstract class AbstractSqlParameterSource : SqlParameterSource {
     }
 }
 
+// Full list here: https://jdbc.postgresql.org/documentation/publicapi/constant-values.html
 private val oidMap: Map<String, UInt> = hashMapOf(
     Boolean::class.namedClassName to 16u,
     ByteArray::class.namedClassName to 17u,
     Long::class.namedClassName to 20u,
-    Int::class.namedClassName to 20u, // TODO this is long not int
+    Int::class.namedClassName to 23u,
     String::class.namedClassName to 25u,
     Double::class.namedClassName to 701u,
     LocalDate::class.namedClassName to 1082u,

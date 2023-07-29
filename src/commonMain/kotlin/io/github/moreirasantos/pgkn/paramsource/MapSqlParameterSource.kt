@@ -4,10 +4,9 @@ package io.github.moreirasantos.pgkn.paramsource
 /**
  * [SqlParameterSource] implementation that holds a given Map of parameters.
  *
- * The `addValue` methods on this class will make adding several values
+ * The [addValue] methods on this class will make adding several values
  * easier. The methods return a reference to the [MapSqlParameterSource]
  * itself, so you can chain several method calls together within a single statement.
- *
  */
 class MapSqlParameterSource : AbstractSqlParameterSource {
     private val values: MutableMap<String, Any?> = LinkedHashMap()
