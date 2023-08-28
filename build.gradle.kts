@@ -5,7 +5,7 @@ import com.bmuschko.gradle.docker.tasks.image.DockerPullImage
 import io.gitlab.arturbosch.detekt.Detekt
 
 plugins {
-    val kotlinVersion = "1.9.0"
+    val kotlinVersion = "1.9.10"
     kotlin("multiplatform") version kotlinVersion
     id("com.bmuschko.docker-remote-api") version "9.3.2"
     id("io.gitlab.arturbosch.detekt").version("1.23.0")
