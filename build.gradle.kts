@@ -7,7 +7,7 @@ import io.gitlab.arturbosch.detekt.Detekt
 plugins {
     val kotlinVersion = "1.9.10"
     kotlin("multiplatform") version kotlinVersion
-    id("com.bmuschko.docker-remote-api") version "9.3.3"
+    id("com.bmuschko.docker-remote-api") version "9.3.4"
     id("io.gitlab.arturbosch.detekt").version("1.23.0")
     id("convention.publication")
 }
