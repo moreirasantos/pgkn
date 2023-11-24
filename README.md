@@ -1,4 +1,3 @@
-
 [![Kotlin Experimental](https://kotl.in/badges/experimental.svg)](https://kotlinlang.org/docs/components-stability.html)
 [![CI](https://github.com/miguel-moreira/pgkn/actions/workflows/blank.yml/badge.svg?branch=main)](https://github.com/miguel-moreira/pgkn/actions/workflows/blank.yml)
 [![GitHub license](https://img.shields.io/badge/license-Apache%20License%202.0-blue.svg?style=flat)](http://www.apache.org/licenses/LICENSE-2.0)
@@ -6,12 +5,15 @@
 [![Kotlin](https://img.shields.io/badge/kotlin-1.9.0-blue.svg?logo=kotlin)](http://kotlinlang.org)
 
 # pgkn
+
 PostgreSQL Kotlin/Native Driver
 
 ## Usage
+
 ```
 implementation("io.github.moreirasantos:pgkn:1.0.0")
 ```
+
 ```kotlin
 fun main() {
     val driver = PostgresDriver(
@@ -42,14 +44,27 @@ fun main() {
     }
 }
 ```
+
 ## Features
-## Named Parameters
+
+### Connection Pool
+
+PGKN has a connection pool, its size being configurable in `PostgresDriver()` - 20 by default.  
+It will refresh connection units if the query fails fatally, but it still needs more fine-grained status checks.
+
+
+You can also use a single connection with `PostgresDriverUnit`, which currently is not `suspend`
+but probably will be in the future.
+
+### Named Parameters
+
 ```kotlin
 driver.execute(
     "select name from my_table where name = :one OR email = :other",
     mapOf("one" to "your_name", "other" to "your@email.com")
 ) { it.getString(0) }
 ```
+
 Named Parameters provides an alternative to the traditional syntax using `?` to specify parameters.
 Under the hood, it substitutes the named parameters to a query placeholder.
 

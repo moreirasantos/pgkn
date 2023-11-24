@@ -2,6 +2,7 @@ package io.github.moreirasantos.pgkn
 
 import io.github.moreirasantos.pgkn.paramsource.MapSqlParameterSource
 import io.github.moreirasantos.pgkn.paramsource.SqlParameterSource
+import io.github.moreirasantos.pgkn.pool.ConnectionPool
 import io.github.moreirasantos.pgkn.resultset.PostgresResultSet
 import io.github.moreirasantos.pgkn.resultset.ResultSet
 import io.github.moreirasantos.pgkn.sql.buildValueArray
@@ -16,12 +17,30 @@ import libpq.*
  * You can pass an [SqlParameterSource] to register your own Postgres types.
  */
 sealed interface PostgresDriver {
-    fun <T> execute(sql: String, namedParameters: Map<String, Any?> = emptyMap(), handler: (ResultSet) -> T): List<T>
+    suspend fun <T> execute(
+        sql: String,
+        namedParameters: Map<String, Any?> = emptyMap(),
+        handler: (ResultSet) -> T
+    ): List<T>
+
+    suspend fun <T> execute(sql: String, paramSource: SqlParameterSource, handler: (ResultSet) -> T): List<T>
+    suspend fun execute(sql: String, namedParameters: Map<String, Any?> = emptyMap()): Long
+    suspend fun execute(sql: String, paramSource: SqlParameterSource): Long
+}
+
+sealed interface PostgresDriverUnit {
+    fun <T> execute(
+        sql: String,
+        namedParameters: Map<String, Any?> = emptyMap(),
+        handler: (ResultSet) -> T
+    ): List<T>
+
     fun <T> execute(sql: String, paramSource: SqlParameterSource, handler: (ResultSet) -> T): List<T>
     fun execute(sql: String, namedParameters: Map<String, Any?> = emptyMap()): Long
     fun execute(sql: String, paramSource: SqlParameterSource): Long
 }
 
+@Suppress("LongParameterList")
 @OptIn(ExperimentalForeignApi::class)
 fun PostgresDriver(
     host: String,
@@ -29,7 +48,24 @@ fun PostgresDriver(
     database: String,
     user: String,
     password: String,
-): PostgresDriver = PostgresDriverImpl(
+    poolSize: Int = 20
+): PostgresDriver = PostgresDriverPool(
+    host = host,
+    port = port,
+    database = database,
+    user = user,
+    password = password,
+    poolSize = poolSize
+)
+
+@OptIn(ExperimentalForeignApi::class)
+fun PostgresDriverUnit(
+    host: String,
+    port: Int = 5432,
+    database: String,
+    user: String,
+    password: String
+): PostgresDriverUnit = PostgresDriverImpl(
     host = host,
     port = port,
     database = database,
@@ -38,15 +74,53 @@ fun PostgresDriver(
 )
 
 @ExperimentalForeignApi
-private class PostgresDriverImpl(
+private class PostgresDriverPool(
     host: String,
-    port: Int,
+    port: Int = 5432,
     database: String,
     user: String,
     password: String,
+    poolSize: Int
 ) : PostgresDriver {
 
-    private val connection = PQsetdbLogin(
+    private val pool = ConnectionPool((1..poolSize).map {
+        PostgresDriverImpl(
+            host = host,
+            port = port,
+            database = database,
+            user = user,
+            password = password,
+        )
+    })
+
+    override suspend fun <T> execute(
+        sql: String,
+        namedParameters: Map<String, Any?>,
+        handler: (ResultSet) -> T
+    ) = pool.invoke { it.execute(sql, namedParameters, handler) }
+
+    override suspend fun <T> execute(sql: String, paramSource: SqlParameterSource, handler: (ResultSet) -> T) =
+        pool.invoke { it.execute(sql, paramSource, handler) }
+
+    override suspend fun execute(sql: String, namedParameters: Map<String, Any?>) =
+        pool.invoke { it.execute(sql, namedParameters) }
+
+    override suspend fun execute(sql: String, paramSource: SqlParameterSource) =
+        pool.invoke { it.execute(sql, paramSource) }
+}
+
+@ExperimentalForeignApi
+private class PostgresDriverImpl(
+    private val host: String,
+    private val port: Int,
+    private val database: String,
+    private val user: String,
+    private val password: String,
+) : PostgresDriverUnit {
+
+    var connection = initConnection()
+
+    private fun initConnection() = PQsetdbLogin(
         pghost = host,
         pgport = port.toString(),
         dbName = database,
@@ -126,14 +200,19 @@ private class PostgresDriverImpl(
     private fun CPointer<PGresult>?.check(): CPointer<PGresult> {
         val status = PQresultStatus(this)
         check(status == PGRES_TUPLES_OK || status == PGRES_COMMAND_OK || status == PGRES_COPY_IN) {
-            connection.error()
+            val message = connection.error()
+            if (status == PGRES_FATAL_ERROR) {
+                PQfinish(connection)
+                connection = initConnection()
+            }
+            message
         }
         return this!!
     }
 }
 
 @ExperimentalForeignApi
-private fun CPointer<PGconn>?.error(): String = PQerrorMessage(this)!!.toKString().also { PQfinish(this) }
+private fun CPointer<PGconn>?.error(): String = PQerrorMessage(this)!!.toKString()
 
 private const val TEXT_RESULT_FORMAT = 0
 
