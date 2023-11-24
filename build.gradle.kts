@@ -3,9 +3,10 @@ import com.bmuschko.gradle.docker.tasks.container.DockerRemoveContainer
 import com.bmuschko.gradle.docker.tasks.container.DockerStartContainer
 import com.bmuschko.gradle.docker.tasks.image.DockerPullImage
 import io.gitlab.arturbosch.detekt.Detekt
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 
 plugins {
-    val kotlinVersion = "1.9.20"
+    val kotlinVersion = "1.9.21"
     kotlin("multiplatform") version kotlinVersion
     id("com.bmuschko.docker-remote-api") version "9.3.7"
     id("io.gitlab.arturbosch.detekt").version("1.23.0")
@@ -13,7 +14,7 @@ plugins {
 }
 
 group = "io.github.moreirasantos"
-version = "1.0.2"
+version = "1.1.0"
 
 repositories {
     mavenCentral()
@@ -45,6 +46,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.1")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
                 implementation("io.github.oshai:kotlin-logging:5.1.0")
             }
         }
@@ -96,6 +98,15 @@ tasks {
     val linuxX64Test by existing {
         dependsOn(start)
         finalizedBy(remove)
+    }
+}
+
+tasks.withType<Test> {
+    testLogging {
+        events("PASSED", "FAILED", "SKIPPED")
+        exceptionFormat = TestExceptionFormat.FULL
+        showStandardStreams = true
+        showStackTraces = true
     }
 }
 
