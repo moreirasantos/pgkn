@@ -8,7 +8,7 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 plugins {
     val kotlinVersion = "1.9.21"
     kotlin("multiplatform") version kotlinVersion
-    id("com.bmuschko.docker-remote-api") version "9.3.7"
+    id("com.bmuschko.docker-remote-api") version "9.4.0"
     id("io.gitlab.arturbosch.detekt").version("1.23.0")
     id("convention.publication")
 }
