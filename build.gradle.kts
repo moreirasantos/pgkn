@@ -6,7 +6,7 @@ import io.gitlab.arturbosch.detekt.Detekt
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 
 plugins {
-    val kotlinVersion = "1.9.21"
+    val kotlinVersion = "1.9.22"
     kotlin("multiplatform") version kotlinVersion
     id("com.bmuschko.docker-remote-api") version "9.3.7"
     id("io.gitlab.arturbosch.detekt").version("1.23.0")
