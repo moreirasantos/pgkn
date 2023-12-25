@@ -47,7 +47,7 @@ kotlin {
             dependencies {
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.1")
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
-                implementation("io.github.oshai:kotlin-logging:5.1.0")
+                implementation("io.github.oshai:kotlin-logging:6.0.1")
             }
         }
         val commonTest by getting
