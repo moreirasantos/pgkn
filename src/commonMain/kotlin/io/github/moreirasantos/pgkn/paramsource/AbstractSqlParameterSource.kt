@@ -59,7 +59,7 @@ abstract class AbstractSqlParameterSource : SqlParameterSource {
      * @return the type name of the parameter,
      * or `null` if not registered
      */
-    fun getTypeName(paramName: String) = typeNames[paramName]
+    override fun getTypeName(paramName: String?) = typeNames[paramName]
 
     /**
      * Enumerate the parameter names and values with their corresponding SQL type if available,

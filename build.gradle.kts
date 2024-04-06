@@ -9,7 +9,7 @@ plugins {
     val kotlinVersion = "1.9.23"
     kotlin("multiplatform") version kotlinVersion
     id("com.bmuschko.docker-remote-api") version "9.4.0"
-    id("io.gitlab.arturbosch.detekt").version("1.23.0")
+    id("io.gitlab.arturbosch.detekt").version("1.23.6")
     id("convention.publication")
 }
 
@@ -38,6 +38,7 @@ kotlin {
             }
         }
     }
+    jvm()
 
     /*
     // Currently unsupported
@@ -50,17 +51,31 @@ kotlin {
     macosX64("macosX64")
     */
 
-    // android, ios, watchos, tvos, jvm, js will never(?) be supported
+    // android, ios, watchos, tvos, js will never(?) be supported
     applyDefaultHierarchyTemplate()
     sourceSets {
-        val nativeMain by getting {
+        val commonMain by getting {
             dependencies {
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0")
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
                 implementation("io.github.oshai:kotlin-logging:6.0.3")
             }
         }
-        val nativeTest by getting
+
+        val jvmMain by getting {
+            dependencies {
+                implementation("org.springframework.data:spring-data-r2dbc:3.2.4")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactive:1.8.0")
+                implementation("org.postgresql:r2dbc-postgresql:1.0.4.RELEASE")
+                implementation("io.r2dbc:r2dbc-pool:1.0.1.RELEASE")
+            }
+        }
+        val jvmTest by getting {
+            dependencies {
+                implementation("org.postgresql:r2dbc-postgresql:1.0.4.RELEASE")
+                implementation("org.jetbrains.kotlin:kotlin-test:1.9.23")
+            }
+        }
     }
 }
 
@@ -113,12 +128,17 @@ tasks {
                 finalizedBy(remove)
             }
         }
+
         "Linux" -> {
             val linuxX64Test by getting {
                 dependsOn(start)
                 finalizedBy(remove)
             }
         }
+    }
+    val jvmTest by getting {
+        dependsOn(start)
+        finalizedBy(remove)
     }
 }
 
@@ -142,7 +162,7 @@ tasks.withType<Detekt>().configureEach {
     exclude("**/build/**")
 
     reports {
-        jvmTarget = "17"
+        jvmTarget = "21"
         html.required.set(true) // observe findings in your browser with structure and code snippets
         sarif.required.set(true) // standardized SARIF format (https://sarifweb.azurewebsites.net/)
     }
@@ -159,5 +179,5 @@ tasks {
 */
 
 java {
-    targetCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_21
 }
