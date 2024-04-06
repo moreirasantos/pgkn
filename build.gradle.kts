@@ -6,9 +6,9 @@ import io.gitlab.arturbosch.detekt.Detekt
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 
 plugins {
-    val kotlinVersion = "1.9.21"
+    val kotlinVersion = "1.9.23"
     kotlin("multiplatform") version kotlinVersion
-    id("com.bmuschko.docker-remote-api") version "9.3.7"
+    id("com.bmuschko.docker-remote-api") version "9.4.0"
     id("io.gitlab.arturbosch.detekt").version("1.23.0")
     id("convention.publication")
 }
@@ -22,12 +22,23 @@ repositories {
 kotlin {
     // Tiers are in accordance with <https://kotlinlang.org/docs/native-target-support.html>
     // Tier 1
-    linuxX64 {
-        val main by compilations.getting
-        val libpq by main.cinterops.creating {
-            defFile(project.file("src/nativeInterop/cinterop/libpq.def"))
+    // TODO find out how to get mac to compile linux64
+    when (System.getProperty("os.name")) {
+        "Mac OS X" -> macosArm64 {
+            val main by compilations.getting
+            val libpq by main.cinterops.creating {
+                defFile(project.file("src/nativeInterop/cinterop/libpq.def"))
+            }
+        }
+
+        "Linux" -> linuxX64 {
+            val main by compilations.getting
+            val libpq by main.cinterops.creating {
+                defFile(project.file("src/nativeInterop/cinterop/libpq.def"))
+            }
         }
     }
+
     /*
     // Currently unsupported
     // Tier 2
@@ -37,20 +48,19 @@ kotlin {
 
     // Tier 1
     macosX64("macosX64")
-    macosArm64("macosArm64")
     */
 
     // android, ios, watchos, tvos, jvm, js will never(?) be supported
-
+    applyDefaultHierarchyTemplate()
     sourceSets {
-        val commonMain by getting {
+        val nativeMain by getting {
             dependencies {
-                implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.1")
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
-                implementation("io.github.oshai:kotlin-logging:5.1.0")
+                implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
+                implementation("io.github.oshai:kotlin-logging:6.0.3")
             }
         }
-        val commonTest by getting
+        val nativeTest by getting
     }
 }
 
@@ -95,9 +105,20 @@ val remove by tasks.registering(DockerRemoveContainer::class) {
 }
 
 tasks {
-    val linuxX64Test by existing {
-        dependsOn(start)
-        finalizedBy(remove)
+    // Related to mac linux compile issue
+    when (System.getProperty("os.name")) {
+        "Mac OS X" -> {
+            val macosArm64Test by getting {
+                dependsOn(start)
+                finalizedBy(remove)
+            }
+        }
+        "Linux" -> {
+            val linuxX64Test by getting {
+                dependsOn(start)
+                finalizedBy(remove)
+            }
+        }
     }
 }
 
@@ -127,12 +148,15 @@ tasks.withType<Detekt>().configureEach {
     }
 }
 
-tasks{
-    val publishLinuxX64PublicationToSonatypeRepository by getting {
+/*
+// TODO: Check if it now works without this workaround
+tasks {
+    val publishMacosArm64PublicationToSonatypeRepository by getting {
         // Explicit dependency because gradle says it's implicit and fails build
         dependsOn("signKotlinMultiplatformPublication")
     }
 }
+*/
 
 java {
     targetCompatibility = JavaVersion.VERSION_17
