@@ -114,7 +114,7 @@ tasks {
             }
         }
         "Linux" -> {
-            val macosArm64Test by getting {
+            val linuxX64Test by getting {
                 dependsOn(start)
                 finalizedBy(remove)
             }
