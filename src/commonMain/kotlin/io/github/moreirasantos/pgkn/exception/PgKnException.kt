@@ -4,6 +4,8 @@ sealed class SQLException(message: String? = null, cause: Throwable? = null) : E
 
 class InvalidDataAccessApiUsageException(message: String, cause: Throwable? = null) : SQLException(message, cause)
 
-class AnonymousClassException : SQLException("Class must not be anonymous", null)
+class AnonymousClassException : SQLException("Class must not be anonymous")
 
-class GetColumnValueException(columnIndex: Int) : SQLException("Error getting column $columnIndex value", null)
+class GetColumnValueException(columnIndex: Int) : SQLException("Error getting column $columnIndex value")
+
+class IllegalResultSetAccessException : SQLException("Can't move ResultSet")

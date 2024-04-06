@@ -7,7 +7,7 @@ import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
 
 @Suppress("TooManyFunctions")
-sealed interface ResultSet {
+interface ResultSet {
 
     /**
      * Moves the cursor forward one row from its current position.

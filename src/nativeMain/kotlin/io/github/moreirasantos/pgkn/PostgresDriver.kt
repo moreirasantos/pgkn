@@ -10,36 +10,6 @@ import io.github.moreirasantos.pgkn.sql.parseSql
 import io.github.moreirasantos.pgkn.sql.substituteNamedParameters
 import kotlinx.cinterop.*
 import libpq.*
-
-/**
- * Executes given query with given named parameters.
- * If you pass a handler, you will receive a list of result data.
- * You can pass an [SqlParameterSource] to register your own Postgres types.
- */
-sealed interface PostgresDriver {
-    suspend fun <T> execute(
-        sql: String,
-        namedParameters: Map<String, Any?> = emptyMap(),
-        handler: (ResultSet) -> T
-    ): List<T>
-
-    suspend fun <T> execute(sql: String, paramSource: SqlParameterSource, handler: (ResultSet) -> T): List<T>
-    suspend fun execute(sql: String, namedParameters: Map<String, Any?> = emptyMap()): Long
-    suspend fun execute(sql: String, paramSource: SqlParameterSource): Long
-}
-
-sealed interface PostgresDriverUnit {
-    fun <T> execute(
-        sql: String,
-        namedParameters: Map<String, Any?> = emptyMap(),
-        handler: (ResultSet) -> T
-    ): List<T>
-
-    fun <T> execute(sql: String, paramSource: SqlParameterSource, handler: (ResultSet) -> T): List<T>
-    fun execute(sql: String, namedParameters: Map<String, Any?> = emptyMap()): Long
-    fun execute(sql: String, paramSource: SqlParameterSource): Long
-}
-
 @Suppress("LongParameterList")
 @OptIn(ExperimentalForeignApi::class)
 fun PostgresDriver(
@@ -58,25 +28,10 @@ fun PostgresDriver(
     poolSize = poolSize
 )
 
-@OptIn(ExperimentalForeignApi::class)
-fun PostgresDriverUnit(
-    host: String,
-    port: Int = 5432,
-    database: String,
-    user: String,
-    password: String
-): PostgresDriverUnit = PostgresDriverImpl(
-    host = host,
-    port = port,
-    database = database,
-    user = user,
-    password = password
-)
-
 @ExperimentalForeignApi
 private class PostgresDriverPool(
     host: String,
-    port: Int = 5432,
+    port: Int,
     database: String,
     user: String,
     password: String,
@@ -107,6 +62,18 @@ private class PostgresDriverPool(
 
     override suspend fun execute(sql: String, paramSource: SqlParameterSource) =
         pool.invoke { it.execute(sql, paramSource) }
+}
+
+internal sealed interface PostgresDriverUnit {
+    fun <T> execute(
+        sql: String,
+        namedParameters: Map<String, Any?> = emptyMap(),
+        handler: (ResultSet) -> T
+    ): List<T>
+
+    fun <T> execute(sql: String, paramSource: SqlParameterSource, handler: (ResultSet) -> T): List<T>
+    fun execute(sql: String, namedParameters: Map<String, Any?> = emptyMap()): Long
+    fun execute(sql: String, paramSource: SqlParameterSource): Long
 }
 
 @ExperimentalForeignApi
