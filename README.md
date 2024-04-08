@@ -73,3 +73,13 @@ In JDBC, the placeholder would be `?` but with libpq, we will pass `$1`, `$2`, e
 
 This feature implementation tries to follow Spring's `NamedParameterJdbcTemplate` as close as possible.
 [NamedParameterJdbcTemplate](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/jdbc/core/namedparam/NamedParameterJdbcTemplate.html)
+
+## FAQ
+
+### Two HomeBrews
+
+TODO - clarify this better:
+
+1. https://stackoverflow.com/questions/64951024/how-can-i-run-two-isolated-installations-of-homebrew
+2. Two homebrews is good for macosarm and macosX, but it isn't enough for linuxX64
+3. For linuxX64 I had to brew install libpq in linux and copy over the files to macos

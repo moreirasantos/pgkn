@@ -4,6 +4,7 @@ import com.bmuschko.gradle.docker.tasks.container.DockerStartContainer
 import com.bmuschko.gradle.docker.tasks.image.DockerPullImage
 import io.gitlab.arturbosch.detekt.Detekt
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
 plugins {
     val kotlinVersion = "1.9.23"
@@ -21,39 +22,34 @@ repositories {
 }
 kotlin {
     // Tiers are in accordance with <https://kotlinlang.org/docs/native-target-support.html>
-    // Tier 1
-    // TODO find out how to get mac to compile linux64
-    when (System.getProperty("os.name")) {
-        "Mac OS X" -> macosArm64 {
-            val main by compilations.getting
-            val libpq by main.cinterops.creating {
-                defFile(project.file("src/nativeInterop/cinterop/libpq.def"))
-            }
-        }
-
-        "Linux" -> linuxX64 {
-            val main by compilations.getting
-            val libpq by main.cinterops.creating {
-                defFile(project.file("src/nativeInterop/cinterop/libpq.def"))
+    fun KotlinNativeTarget.libpq(filename: String) {
+        val main by compilations.getting {
+            cinterops {
+                val libpq by registering {
+                    defFile(project.file("src/nativeInterop/cinterop/$filename"))
+                }
             }
         }
     }
+
+    macosArm64 { libpq("libpqArm.def") }
+    macosX64 { libpq("libpqX.def") }
+    linuxArm64 { libpq("libpqArm.def") }
+    linuxX64 { libpq("libpqlinuxX.def") }
     jvm()
 
     /*
     // Currently unsupported
-    // Tier 2
-    linuxArm64("linuxArm64")
     // Tier 3
     mingwX64("mingwX64")
-
-    // Tier 1
-    macosX64("macosX64")
     */
 
     // android, ios, watchos, tvos, js will never(?) be supported
     applyDefaultHierarchyTemplate()
     sourceSets {
+        configureEach {
+            languageSettings.progressiveMode = true
+        }
         val commonMain by getting {
             dependencies {
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0")
@@ -120,22 +116,23 @@ val remove by tasks.registering(DockerRemoveContainer::class) {
 }
 
 tasks {
-    // Related to mac linux compile issue
-    when (System.getProperty("os.name")) {
-        "Mac OS X" -> {
-            val macosArm64Test by getting {
-                dependsOn(start)
-                finalizedBy(remove)
-            }
-        }
-
-        "Linux" -> {
-            val linuxX64Test by getting {
-                dependsOn(start)
-                finalizedBy(remove)
-            }
-        }
+    // Find a better way to depend on those tasks
+    val macosArm64Test by getting {
+        dependsOn(start)
+        finalizedBy(remove)
     }
+    val macosX64Test by getting {
+        dependsOn(start)
+        finalizedBy(remove)
+    }
+    /*val linuxArm64Test by getting {
+        dependsOn(start)
+        finalizedBy(remove)
+    }
+    val linuxX64Test by getting {
+        dependsOn(start)
+        finalizedBy(remove)
+    }*/
     val jvmTest by getting {
         dependsOn(start)
         finalizedBy(remove)

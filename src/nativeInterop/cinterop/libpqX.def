@@ -1,0 +1,6 @@
+headers = libpq-fe.h
+headerFilter = *
+package = libpq
+
+compilerOpts = -I/usr/local/opt/libpq/include
+linkerOpts = -L/usr/local/opt/libpq/lib -lpq
