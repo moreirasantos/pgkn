@@ -58,7 +58,7 @@ kotlin {
             dependencies {
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0")
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
-                implementation("io.github.oshai:kotlin-logging:6.0.3")
+                implementation("io.github.oshai:kotlin-logging:6.0.9")
             }
         }
 
