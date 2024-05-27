@@ -2,6 +2,6 @@ headers = libpq-fe.h
 headerFilter = libpq-fe.h
 package = libpq
 
-compilerOpts = -I/usr/local/opt/linux/libpq/include -I/usr/local/opt/libpq/include
-linkerOpts = -L/usr/local/opt/linux/libpq/lib -L/usr/local/opt/libpq/lib -lpq
+compilerOpts = -I/usr/local/opt/linux/libpq/include -I/usr/local/opt/libpq/include -I/home/linuxbrew/.linuxbrew/opt/libpq/include
+linkerOpts = -L/usr/local/opt/linux/libpq/lib -L/usr/local/opt/libpq/lib -L/home/linuxbrew/.linuxbrew/opt/libpq/lib -lpq
 
