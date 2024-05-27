@@ -52,10 +52,6 @@ fun main() {
 PGKN has a connection pool, its size being configurable in `PostgresDriver()` - 20 by default.  
 It will refresh connection units if the query fails fatally, but it still needs more fine-grained status checks.
 
-
-You can also use a single connection with `PostgresDriverUnit`, which currently is not `suspend`
-but probably will be in the future.
-
 ### Named Parameters
 
 ```kotlin
@@ -73,6 +69,17 @@ In JDBC, the placeholder would be `?` but with libpq, we will pass `$1`, `$2`, e
 
 This feature implementation tries to follow Spring's `NamedParameterJdbcTemplate` as close as possible.
 [NamedParameterJdbcTemplate](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/jdbc/core/namedparam/NamedParameterJdbcTemplate.html)
+
+## Development
+
+### Local Build
+
+By default, this project will attempt to build for all targets. If you have a linux machine and only want to build
+the `linuxX64` and `linuxArm64` targets, you can do:
+
+```shell
+./gradlew build -Ptargets=linuxX64,linuxArm64
+```
 
 ## FAQ
 
