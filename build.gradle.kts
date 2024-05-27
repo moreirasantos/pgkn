@@ -68,18 +68,20 @@ kotlin {
             }
         }
 
-        val jvmMain by getting {
-            dependencies {
-                implementation("org.springframework.data:spring-data-r2dbc:3.2.4")
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactive:1.8.0")
-                implementation("org.postgresql:r2dbc-postgresql:1.0.4.RELEASE")
-                implementation("io.r2dbc:r2dbc-pool:1.0.1.RELEASE")
+        if (chosenTargets.contains("jvm")) {
+            val jvmMain by getting {
+                dependencies {
+                    implementation("org.springframework.data:spring-data-r2dbc:3.2.4")
+                    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactive:1.8.0")
+                    implementation("org.postgresql:r2dbc-postgresql:1.0.4.RELEASE")
+                    implementation("io.r2dbc:r2dbc-pool:1.0.1.RELEASE")
+                }
             }
-        }
-        val jvmTest by getting {
-            dependencies {
-                implementation("org.postgresql:r2dbc-postgresql:1.0.4.RELEASE")
-                implementation("org.jetbrains.kotlin:kotlin-test:1.9.23")
+            val jvmTest by getting {
+                dependencies {
+                    implementation("org.postgresql:r2dbc-postgresql:1.0.4.RELEASE")
+                    implementation("org.jetbrains.kotlin:kotlin-test:1.9.23")
+                }
             }
         }
     }
