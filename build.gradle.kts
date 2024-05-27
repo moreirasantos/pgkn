@@ -71,7 +71,7 @@ kotlin {
         if (chosenTargets.contains("jvm")) {
             val jvmMain by getting {
                 dependencies {
-                    implementation("org.springframework.data:spring-data-r2dbc:3.2.4")
+                    implementation("org.springframework.data:spring-data-r2dbc:3.3.0")
                     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactive:1.8.0")
                     implementation("org.postgresql:r2dbc-postgresql:1.0.4.RELEASE")
                     implementation("io.r2dbc:r2dbc-pool:1.0.1.RELEASE")
