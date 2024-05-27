@@ -44,6 +44,8 @@ jobs:
           path: build
   release:
     runs-on: macos-14
+    # Disabled for now.
+    if: false
     needs:
       - test
       - build
