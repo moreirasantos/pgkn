@@ -22,5 +22,7 @@ jobs:
       - name: Set up Homebrew
         uses: Homebrew/actions/setup-homebrew@master
       - run: brew install libpq
+      - run: brew install docker colima
+      - run: colima start
       - run: gradle wrapper --no-daemon
       - run: ./gradlew build detekt --no-daemon -Ptargets=macosArm64
