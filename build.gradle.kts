@@ -4,6 +4,7 @@ import com.bmuschko.gradle.docker.tasks.container.DockerStartContainer
 import com.bmuschko.gradle.docker.tasks.image.DockerPullImage
 import io.gitlab.arturbosch.detekt.Detekt
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
 plugins {
     val kotlinVersion = "1.9.23"
@@ -14,46 +15,51 @@ plugins {
 }
 
 group = "io.github.moreirasantos"
-version = "1.1.0"
+version = "1.2.1"
 
 repositories {
     mavenCentral()
 }
+
+val chosenTargets = (properties["targets"] as? String)?.split(",")
+    ?: listOf("macosArm64", "macosX64", "linuxArm64", "linuxX64", "jvm")
+
 kotlin {
     // Tiers are in accordance with <https://kotlinlang.org/docs/native-target-support.html>
-    // Tier 1
-    // TODO find out how to get mac to compile linux64
-    when (System.getProperty("os.name")) {
-        "Mac OS X" -> macosArm64 {
-            val main by compilations.getting
-            val libpq by main.cinterops.creating {
-                defFile(project.file("src/nativeInterop/cinterop/libpq.def"))
-            }
-        }
-
-        "Linux" -> linuxX64 {
-            val main by compilations.getting
-            val libpq by main.cinterops.creating {
-                defFile(project.file("src/nativeInterop/cinterop/libpq.def"))
+    fun KotlinNativeTarget.libpq(filename: String) {
+        val main by compilations.getting {
+            cinterops {
+                val libpq by registering {
+                    defFile(project.file("src/nativeInterop/cinterop/$filename"))
+                }
             }
         }
     }
-    jvm()
+
+    val availableTargets = mapOf(
+        Pair("macosArm64") { macosArm64 { libpq("libpqArm.def") } },
+        Pair("macosX64") { macosX64 { libpq("libpqX.def") } },
+        Pair("linuxArm64") { linuxArm64 { libpq("libpqArm.def") } },
+        Pair("linuxX64") { linuxX64 { libpq("libpqlinuxX.def") } },
+        Pair("jvm") { jvm() },
+    )
+    chosenTargets.forEach {
+        println("Enabling target $it")
+        availableTargets[it]?.invoke()
+    }
 
     /*
     // Currently unsupported
-    // Tier 2
-    linuxArm64("linuxArm64")
     // Tier 3
     mingwX64("mingwX64")
-
-    // Tier 1
-    macosX64("macosX64")
     */
 
     // android, ios, watchos, tvos, js will never(?) be supported
     applyDefaultHierarchyTemplate()
     sourceSets {
+        configureEach {
+            languageSettings.progressiveMode = true
+        }
         val commonMain by getting {
             dependencies {
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0")
@@ -62,18 +68,20 @@ kotlin {
             }
         }
 
-        val jvmMain by getting {
-            dependencies {
-                implementation("org.springframework.data:spring-data-r2dbc:3.2.4")
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactive:1.8.0")
-                implementation("org.postgresql:r2dbc-postgresql:1.0.4.RELEASE")
-                implementation("io.r2dbc:r2dbc-pool:1.0.1.RELEASE")
+        if (chosenTargets.contains("jvm")) {
+            val jvmMain by getting {
+                dependencies {
+                    implementation("org.springframework.data:spring-data-r2dbc:3.2.4")
+                    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactive:1.8.0")
+                    implementation("org.postgresql:r2dbc-postgresql:1.0.4.RELEASE")
+                    implementation("io.r2dbc:r2dbc-pool:1.0.1.RELEASE")
+                }
             }
-        }
-        val jvmTest by getting {
-            dependencies {
-                implementation("org.postgresql:r2dbc-postgresql:1.0.4.RELEASE")
-                implementation("org.jetbrains.kotlin:kotlin-test:1.9.23")
+            val jvmTest by getting {
+                dependencies {
+                    implementation("org.postgresql:r2dbc-postgresql:1.0.4.RELEASE")
+                    implementation("org.jetbrains.kotlin:kotlin-test:1.9.23")
+                }
             }
         }
     }
@@ -120,25 +128,13 @@ val remove by tasks.registering(DockerRemoveContainer::class) {
 }
 
 tasks {
-    // Related to mac linux compile issue
-    when (System.getProperty("os.name")) {
-        "Mac OS X" -> {
-            val macosArm64Test by getting {
-                dependsOn(start)
-                finalizedBy(remove)
-            }
-        }
-
-        "Linux" -> {
-            val linuxX64Test by getting {
-                dependsOn(start)
-                finalizedBy(remove)
-            }
-        }
-    }
-    val jvmTest by getting {
+    val dependencies: Task.() -> Unit = {
         dependsOn(start)
         finalizedBy(remove)
+    }
+    chosenTargets.forEach {
+        findByName("${it}Test")?.dependencies()
+            ?: register("${it}Test")(dependencies)
     }
 }
 
@@ -168,15 +164,29 @@ tasks.withType<Detekt>().configureEach {
     }
 }
 
-/*
-// TODO: Check if it now works without this workaround
+
 tasks {
-    val publishMacosArm64PublicationToSonatypeRepository by getting {
-        // Explicit dependency because gradle says it's implicit and fails build
-        dependsOn("signKotlinMultiplatformPublication")
+    // Explicit dependency because gradle says it's implicit and fails build
+    val dependencies: Task.() -> Unit = {
+        listOf(
+            "signJvmPublication",
+            "signLinuxX64Publication",
+            "signLinuxArm64Publication",
+            "signMacosArm64Publication",
+            "signMacosX64Publication",
+            "signKotlinMultiplatformPublication"
+        ).forEach { dependsOn(it) }
     }
+    listOf(
+        "publishMacosArm64PublicationToSonatypeRepository",
+        "publishMacosX64PublicationToSonatypeRepository",
+        "publishJvmPublicationToSonatypeRepository",
+        "publishKotlinMultiplatformPublicationToSonatypeRepository",
+        "publishLinuxX64PublicationToSonatypeRepository"
+    ).forEach { findByName(it)?.dependencies() }
+
 }
-*/
+
 
 java {
     targetCompatibility = JavaVersion.VERSION_21

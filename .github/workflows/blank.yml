@@ -1,28 +1,17 @@
-# This is a basic workflow to help you get started with Actions
-
 name: CI
 
-# Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the "main" branch
   push:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
 
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
+  test:
     runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
         with:
@@ -33,4 +22,46 @@ jobs:
         uses: Homebrew/actions/setup-homebrew@master
       - run: brew install libpq
       - run: gradle wrapper --no-daemon
-      - run: ./gradlew build detekt --no-daemon
+      - run: ./gradlew build detekt --no-daemon -Ptargets=linuxX64
+  build:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'gradle'
+      - name: Set up Homebrew
+        uses: Homebrew/actions/setup-homebrew@master
+      - run: brew install libpq
+      - run: gradle wrapper --no-daemon
+      - run: ./gradlew build -x check --no-daemon -Ptargets=macosArm64
+      - name: Archive build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build
+          path: build
+  release:
+    runs-on: macos-14
+    # Disabled for now.
+    if: false
+    needs:
+      - test
+      - build
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'gradle'
+      - name: Set up Homebrew
+        uses: Homebrew/actions/setup-homebrew@master
+      - run: brew install libpq
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build
+      - run: gradle wrapper --no-daemon
+      - run: ./gradlew publishAllPublicationsToSonatypeRepository -x check --no-daemon
