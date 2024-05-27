@@ -15,11 +15,15 @@ plugins {
 }
 
 group = "io.github.moreirasantos"
-version = "1.1.0"
+version = "1.2.1"
 
 repositories {
     mavenCentral()
 }
+
+val chosenTargets = (properties["targets"] as? String)?.split(",")
+    ?: listOf("macosArm64", "macosX64", "linuxArm64", "linuxX64", "jvm")
+
 kotlin {
     // Tiers are in accordance with <https://kotlinlang.org/docs/native-target-support.html>
     fun KotlinNativeTarget.libpq(filename: String) {
@@ -32,11 +36,17 @@ kotlin {
         }
     }
 
-    macosArm64 { libpq("libpqArm.def") }
-    macosX64 { libpq("libpqX.def") }
-    linuxArm64 { libpq("libpqArm.def") }
-    linuxX64 { libpq("libpqlinuxX.def") }
-    jvm()
+    val availableTargets = mapOf(
+        Pair("macosArm64") { macosArm64 { libpq("libpqArm.def") } },
+        Pair("macosX64") { macosX64 { libpq("libpqX.def") } },
+        Pair("linuxArm64") { linuxArm64 { libpq("libpqArm.def") } },
+        Pair("linuxX64") { linuxX64 { libpq("libpqlinuxX.def") } },
+        Pair("jvm") { jvm() },
+    )
+    chosenTargets.forEach {
+        println("Enabling target $it")
+        availableTargets[it]?.invoke()
+    }
 
     /*
     // Currently unsupported
@@ -116,26 +126,13 @@ val remove by tasks.registering(DockerRemoveContainer::class) {
 }
 
 tasks {
-    // Find a better way to depend on those tasks
-    val macosArm64Test by getting {
+    val dependencies: Task.() -> Unit = {
         dependsOn(start)
         finalizedBy(remove)
     }
-    val macosX64Test by getting {
-        dependsOn(start)
-        finalizedBy(remove)
-    }
-    /*val linuxArm64Test by getting {
-        dependsOn(start)
-        finalizedBy(remove)
-    }
-    val linuxX64Test by getting {
-        dependsOn(start)
-        finalizedBy(remove)
-    }*/
-    val jvmTest by getting {
-        dependsOn(start)
-        finalizedBy(remove)
+    chosenTargets.forEach {
+        findByName("${it}Test")?.dependencies()
+            ?: register("${it}Test")(dependencies)
     }
 }
 
@@ -165,15 +162,29 @@ tasks.withType<Detekt>().configureEach {
     }
 }
 
-/*
-// TODO: Check if it now works without this workaround
+
 tasks {
-    val publishMacosArm64PublicationToSonatypeRepository by getting {
-        // Explicit dependency because gradle says it's implicit and fails build
-        dependsOn("signKotlinMultiplatformPublication")
+    // Explicit dependency because gradle says it's implicit and fails build
+    val dependencies: Task.() -> Unit = {
+        listOf(
+            "signJvmPublication",
+            "signLinuxX64Publication",
+            "signLinuxArm64Publication",
+            "signMacosArm64Publication",
+            "signMacosX64Publication",
+            "signKotlinMultiplatformPublication"
+        ).forEach { dependsOn(it) }
     }
+    listOf(
+        "publishMacosArm64PublicationToSonatypeRepository",
+        "publishMacosX64PublicationToSonatypeRepository",
+        "publishJvmPublicationToSonatypeRepository",
+        "publishKotlinMultiplatformPublicationToSonatypeRepository",
+        "publishLinuxX64PublicationToSonatypeRepository"
+    ).forEach { findByName(it)?.dependencies() }
+
 }
-*/
+
 
 java {
     targetCompatibility = JavaVersion.VERSION_21

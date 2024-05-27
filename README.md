@@ -11,7 +11,7 @@ PostgreSQL Kotlin/Native Driver
 ## Usage
 
 ```
-implementation("io.github.moreirasantos:pgkn:1.0.0")
+implementation("io.github.moreirasantos:pgkn:1.2.0")
 ```
 
 ```kotlin
@@ -83,3 +83,5 @@ TODO - clarify this better:
 1. https://stackoverflow.com/questions/64951024/how-can-i-run-two-isolated-installations-of-homebrew
 2. Two homebrews is good for macosarm and macosX, but it isn't enough for linuxX64
 3. For linuxX64 I had to brew install libpq in linux and copy over the files to macos
+4. https://discuss.kotlinlang.org/t/how-to-determine-linkeropts-at-build-time/17402/2
+5. https://github.com/JetBrains/kotlin-native/issues/1534
