@@ -84,7 +84,7 @@ If you have a linux machine and only want to build the `linuxX64` and `linuxArm6
 for a macOS:
 
 ```shell
-./gradlew build -Ptargets=macosArm64,jvm
+./gradlew build -Ptargets=macosArm64
 ```
 
 Additionally, you can build for JVM:
