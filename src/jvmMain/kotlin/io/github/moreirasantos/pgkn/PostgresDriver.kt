@@ -37,8 +37,25 @@ fun PostgresDriver(
     user: String,
     password: String,
     poolSize: Int = 20
-): PostgresDriver {
-    val pool: ConnectionFactory = ConnectionFactories.get(
+): PostgresDriver = PostgresDriverPool(
+    host = host,
+    port = port,
+    database = database,
+    user = user,
+    password = password,
+    poolSize = poolSize
+)
+
+private class PostgresDriverPool(
+    host: String,
+    port: Int,
+    database: String,
+    user: String,
+    password: String,
+    poolSize: Int
+) : PostgresDriver {
+
+    private val pool: ConnectionFactory = ConnectionFactories.get(
         builder()
             .option(DRIVER, "pool")
             .option(PROTOCOL, "postgresql")
@@ -56,13 +73,6 @@ fun PostgresDriver(
         // So, we can warm up the pool here (blocking).
         (this as? ConnectionPool)?.let { runBlocking { warmup().awaitFirst() } }
     }
-
-    return PostgresDriverPool(pool)
-}
-
-private class PostgresDriverPool(
-    private val pool: ConnectionFactory
-) : PostgresDriver {
 
     override suspend fun <T> execute(
         sql: String,
