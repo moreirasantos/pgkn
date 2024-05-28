@@ -74,11 +74,23 @@ This feature implementation tries to follow Spring's `NamedParameterJdbcTemplate
 
 ### Local Build
 
-By default, this project will attempt to build for all targets. If you have a linux machine and only want to build
-the `linuxX64` and `linuxArm64` targets, you can do:
+By default, this project will attempt to build for all targets.
+If you have a linux machine and only want to build the `linuxX64` and `linuxArm64` targets, you can do:
 
 ```shell
 ./gradlew build -Ptargets=linuxX64,linuxArm64
+```
+
+for a macOS:
+
+```shell
+./gradlew build -Ptargets=macosArm64,jvm
+```
+
+Additionally, you can build for JVM:
+
+```shell
+./gradlew build -Ptargets=macosArm64,jvm
 ```
 
 ## FAQ
