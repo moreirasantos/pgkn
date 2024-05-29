@@ -18,5 +18,9 @@ interface PostgresDriver {
     suspend fun <T> execute(sql: String, paramSource: SqlParameterSource, handler: (ResultSet) -> T): List<T>
     suspend fun execute(sql: String, namedParameters: Map<String, Any?> = emptyMap()): Long
     suspend fun execute(sql: String, paramSource: SqlParameterSource): Long
+
+    /**
+     * Warm-up the connection pool.
+     */
     suspend fun warmup()
 }
