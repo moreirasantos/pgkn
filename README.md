@@ -70,6 +70,12 @@ In JDBC, the placeholder would be `?` but with libpq, we will pass `$1`, `$2`, e
 This feature implementation tries to follow Spring's `NamedParameterJdbcTemplate` as close as possible.
 [NamedParameterJdbcTemplate](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/jdbc/core/namedparam/NamedParameterJdbcTemplate.html)
 
+## Logging
+
+Currently, we don't have implemented the logging layer, we're still thinking on how could implement it.
+So, any contributions are welcome.
+Although, at the moment, and only for the `jvmTest`, we make use of the `slf4j` libraries in order to make the development process easier.
+
 ## Development
 
 ### Local Build
