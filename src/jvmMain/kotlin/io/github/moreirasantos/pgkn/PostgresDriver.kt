@@ -26,7 +26,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.reactive.awaitFirst
-import kotlinx.coroutines.runBlocking
 import java.util.*
 
 @Suppress("LongParameterList")
@@ -55,6 +54,7 @@ private class PostgresDriverPool(
     poolSize: Int
 ) : PostgresDriver {
 
+    // https://github.com/r2dbc/r2dbc-pool
     private val pool: ConnectionFactory = ConnectionFactories.get(
         builder()
             .option(DRIVER, "pool")
@@ -67,12 +67,7 @@ private class PostgresDriverPool(
             .option(INITIAL_SIZE, poolSize)
             .option(MAX_SIZE, poolSize)
             .build()
-    ).apply {
-        // https://github.com/r2dbc/r2dbc-pool
-        // ConnectionFactories.get(..) creates a [ConnectionPool] wrapping an underlying [ConnectionFactory].
-        // So, we can warm up the pool here (blocking).
-        (this as? ConnectionPool)?.let { runBlocking { warmup().awaitFirst() } }
-    }
+    )
 
     override suspend fun <T> execute(
         sql: String,
@@ -91,6 +86,11 @@ private class PostgresDriverPool(
 
     override suspend fun execute(sql: String, paramSource: SqlParameterSource): Long =
         doExecute(sql, paramSource).returnCount()
+
+    override suspend fun warmup() {
+        // ConnectionFactories.get(..) creates a [ConnectionPool] wrapping an underlying [ConnectionFactory].
+        (pool as ConnectionPool).warmup().awaitFirst()
+    }
 
     private suspend fun doExecute(sql: String): Flow<Result> =
         pool.create().awaitFirst().createStatement(sql).execute().asFlow()
