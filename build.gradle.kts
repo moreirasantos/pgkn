@@ -54,7 +54,7 @@ kotlin {
     mingwX64("mingwX64")
     */
 
-    // android, ios, watchos, tvos, js will never(?) be supported
+    // Android, ios, watchOS, tvos, js will never(?) be supported.
     applyDefaultHierarchyTemplate()
     sourceSets {
         configureEach {
@@ -71,7 +71,6 @@ kotlin {
         if (chosenTargets.contains("jvm")) {
             val jvmMain by getting {
                 dependencies {
-                    implementation("org.springframework.data:spring-data-r2dbc:3.2.4")
                     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactive:1.8.0")
                     implementation("org.postgresql:r2dbc-postgresql:1.0.4.RELEASE")
                     implementation("io.r2dbc:r2dbc-pool:1.0.1.RELEASE")
@@ -79,6 +78,9 @@ kotlin {
             }
             val jvmTest by getting {
                 dependencies {
+                    // https://mvnrepository.com/artifact/org.slf4j/slf4j-api
+                    implementation("org.slf4j:slf4j-api:2.0.13")
+                    implementation("org.slf4j:slf4j-reload4j:2.0.13")
                     implementation("org.postgresql:r2dbc-postgresql:1.0.4.RELEASE")
                     implementation("org.jetbrains.kotlin:kotlin-test:1.9.23")
                 }
@@ -95,11 +97,7 @@ val create by tasks.registering(DockerCreateContainer::class) {
     dependsOn(pull)
     containerName.set("test")
     imageId.set("postgres:15-alpine")
-    this.envVars.set(
-        mapOf(
-            "POSTGRES_PASSWORD" to "postgres"
-        )
-    )
+    envVars.set(mapOf("POSTGRES_PASSWORD" to "postgres"))
     hostConfig.portBindings.set(listOf("5678:5432"))
 
     /*
@@ -109,7 +107,7 @@ val create by tasks.registering(DockerCreateContainer::class) {
     healthCheck.timeout.set(1000000000)
     healthCheck.retries.set(3)
     healthCheck.startPeriod.set(100000000000000)
-     */
+    */
 }
 val start by tasks.registering(DockerStartContainer::class) {
     dependsOn(create)
@@ -186,7 +184,6 @@ tasks {
     ).forEach { findByName(it)?.dependencies() }
 
 }
-
 
 java {
     targetCompatibility = JavaVersion.VERSION_21

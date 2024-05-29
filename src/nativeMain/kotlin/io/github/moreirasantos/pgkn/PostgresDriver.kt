@@ -10,6 +10,7 @@ import io.github.moreirasantos.pgkn.sql.parseSql
 import io.github.moreirasantos.pgkn.sql.substituteNamedParameters
 import kotlinx.cinterop.*
 import libpq.*
+
 @Suppress("LongParameterList")
 @OptIn(ExperimentalForeignApi::class)
 fun PostgresDriver(
@@ -62,6 +63,10 @@ private class PostgresDriverPool(
 
     override suspend fun execute(sql: String, paramSource: SqlParameterSource) =
         pool.invoke { it.execute(sql, paramSource) }
+
+    override suspend fun warmup() {
+        // Intentionally left empty since the default behaviour warmups the connection pool.
+    }
 }
 
 internal sealed interface PostgresDriverUnit {
