@@ -182,7 +182,8 @@ tasks {
         "publishMacosX64PublicationToSonatypeRepository",
         "publishJvmPublicationToSonatypeRepository",
         "publishKotlinMultiplatformPublicationToSonatypeRepository",
-        "publishLinuxX64PublicationToSonatypeRepository"
+        "publishLinuxX64PublicationToSonatypeRepository",
+        "publishLinuxArm64PublicationToSonatypeRepository"
     ).forEach { findByName(it)?.dependencies() }
 
 }

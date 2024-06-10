@@ -12,8 +12,6 @@ ext["signing.secretKeyRingFile"] = null
 ext["ossrhUsername"] = null
 ext["ossrhPassword"] = null
 
-var something = ""
-
 // Grabbing secrets from local.properties file or from environment variables, which could be used on CI
 val secretPropsFile = project.rootProject.file("local.properties")
 if (secretPropsFile.exists()) {
@@ -24,7 +22,6 @@ if (secretPropsFile.exists()) {
     }.onEach { (name, value) ->
         ext[name.toString()] = value
     }
-    something = "file"
 } else {
     println("Skipping local.properties")
     ext["signing.keyId"] = System.getenv("SIGNING_KEY_ID")
@@ -32,7 +29,6 @@ if (secretPropsFile.exists()) {
     ext["signing.secretKeyRingFile"] = System.getenv("SIGNING_SECRET_KEY_RING_FILE")
     ext["ossrhUsername"] = System.getenv("OSSRH_USERNAME")
     ext["ossrhPassword"] = System.getenv("OSSRH_PASSWORD")
-    something = "env"
 }
 
 val javadocJar by tasks.registering(Jar::class) {
@@ -56,8 +52,6 @@ publishing {
 
     // Configure all publications
     publications.withType<MavenPublication> {
-        println("signing....")
-        println(something)
         // Stub javadoc.jar artifact
         artifact(javadocJar.get())
 
