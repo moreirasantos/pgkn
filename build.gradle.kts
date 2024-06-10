@@ -80,7 +80,7 @@ kotlin {
             val jvmTest by getting {
                 dependencies {
                     implementation("org.postgresql:r2dbc-postgresql:1.0.4.RELEASE")
-                    implementation("org.jetbrains.kotlin:kotlin-test:1.9.23")
+                    implementation("org.jetbrains.kotlin:kotlin-test:2.0.0")
                 }
             }
         }
