@@ -58,7 +58,6 @@ publishing {
     publications.withType<MavenPublication> {
         println("signing....")
         println(something)
-        println(ext["signing.secretKeyRingFile"])
         // Stub javadoc.jar artifact
         artifact(javadocJar.get())
 
