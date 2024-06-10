@@ -1,0 +1,6 @@
+headers = libpq-fe.h
+headerFilter = *
+package = libpq
+
+compilerOpts = -I./prebuilds/linuxArm64/headers/libpq -I/opt/homebrew/opt/libpq/include -I/usr/local/opt/libpq/include
+linkerOpts = -L./prebuilds/linuxArm64/binaries/libpq -L/opt/homebrew/opt/libpq/lib -L/usr/local/opt/libpq/lib -lpq

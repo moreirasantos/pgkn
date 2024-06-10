@@ -1,0 +1,14 @@
+prefix=/opt/homebrew/Cellar/libpq/16.2_1
+exec_prefix=${prefix}
+libdir=/opt/homebrew/opt/libpq/lib
+includedir=/opt/homebrew/opt/libpq/include
+
+Name: libpq
+Description: PostgreSQL libpq library
+URL: https://www.postgresql.org/
+Version: 16.2
+Requires: 
+Requires.private: libssl, libcrypto
+Cflags: -I${includedir}
+Libs: -L${libdir} -lpq
+Libs.private:  -lpgcommon -lpgport -lssl -lgssapi_krb5 -lm

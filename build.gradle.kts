@@ -37,10 +37,10 @@ kotlin {
     }
 
     val availableTargets = mapOf(
-        Pair("macosArm64") { macosArm64 { libpq("libpqArm.def") } },
-        Pair("macosX64") { macosX64 { libpq("libpqX.def") } },
-        Pair("linuxArm64") { linuxArm64 { libpq("libpqArm.def") } },
-        Pair("linuxX64") { linuxX64 { libpq("libpqlinuxX.def") } },
+        Pair("macosArm64") { macosArm64 { libpq("libpqMacosArm64.def") } },
+        Pair("macosX64") { macosX64 { libpq("libpqMacosX64.def") } },
+        Pair("linuxArm64") { linuxArm64 { libpq("libpqLinuxArm64.def") } },
+        Pair("linuxX64") { linuxX64 { libpq("libpqLinuxX64.def") } },
         Pair("jvm") { jvm() },
     )
     chosenTargets.forEach {
