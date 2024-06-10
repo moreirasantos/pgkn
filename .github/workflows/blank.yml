@@ -50,7 +50,6 @@ jobs:
       SIGNING_KEY_ID: ${{ secrets.SIGNING_KEY_ID }}
       SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
       SIGNING_PRIVATE_KEY_B64: ${{ secrets.SIGNING_PRIVATE_KEY_B64 }}
-      SIGNING_SECRET_KEY_RING_FILE: ${{ secrets.SIGNING_SECRET_KEY_RING_FILE }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
