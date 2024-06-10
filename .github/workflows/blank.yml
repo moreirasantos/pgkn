@@ -60,18 +60,18 @@ jobs:
       - run: echo -n "$SIGNING_PRIVATE_KEY_B64" | base64 --decode | gpg --batch --passphrase $SIGNING_PASSWORD --import
       - run: gpg --batch --pinentry-mode=loopback --passphrase $SIGNING_PASSWORD --export-secret-keys > secring.gpg
       - run: export SIGNING_SECRET_KEY_RING_FILE=&(realpath secring.gpg)
-#      - name: Download build artifacts
-#        uses: actions/download-artifact@v4
-#        with:
-#          name: build
-#      - run: gradle wrapper --no-daemon
-#      - run: ./gradlew publishAllPublicationsToSonatypeRepository -x check --no-daemon
-#      - name: Create release
-#        env:
-#          tag: ${{ github.ref_name }}
-#        run: |
-#          export tag=$(cat version.txt)
-#          gh release create "$tag" \
-#              --repo="$GITHUB_REPOSITORY" \
-#              --title="${GITHUB_REPOSITORY#*/} $tag" \
-#              --generate-notes
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build
+      - run: gradle wrapper --no-daemon
+      - run: ./gradlew publishAllPublicationsToSonatypeRepository -x check --no-daemon
+      - name: Create release
+        env:
+          tag: ${{ github.ref_name }}
+        run: |
+          export tag=$(cat version.txt)
+          gh release create "$tag" \
+              --repo="$GITHUB_REPOSITORY" \
+              --title="${GITHUB_REPOSITORY#*/} $tag" \
+              --generate-notes
