@@ -56,6 +56,9 @@ publishing {
 
     // Configure all publications
     publications.withType<MavenPublication> {
+        println("signing....")
+        println(something)
+        println(ext["signing.secretKeyRingFile"])
         // Stub javadoc.jar artifact
         artifact(javadocJar.get())
 
@@ -87,9 +90,6 @@ publishing {
 
 // Signing artifacts. Signing.* extra properties values will be used
 signing {
-    println("signing....")
-    println(something)
-    println(ext["signing.secretKeyRingFile"])
     sign(publishing.publications)
 }
 
