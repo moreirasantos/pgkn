@@ -71,6 +71,7 @@ jobs:
       - name: Create release
         env:
           tag: ${{ github.ref_name }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           export tag=$(cat version.txt)
           gh release create "$tag" \
