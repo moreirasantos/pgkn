@@ -59,6 +59,8 @@ jobs:
           java-version: '17'
           cache: 'gradle'
       - run: echo -n "$SIGNING_PRIVATE_KEY_B64" | base64 --decode | gpg --batch --passphrase $SIGNING_PASSWORD --import
+      - run: gpg --batch --pinentry-mode=loopback --passphrase $SIGNING_PASSWORD --export-secret-keys > secring.gpg
+      - run: export SIGNING_SECRET_KEY_RING_FILE=&(realpath secring.gpg)
 #      - name: Download build artifacts
 #        uses: actions/download-artifact@v4
 #        with:
