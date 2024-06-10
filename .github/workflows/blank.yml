@@ -58,6 +58,8 @@ jobs:
           cache: 'gradle'
       - run: echo -n "$SIGNING_PRIVATE_KEY_B64" | base64 --decode | gpg --batch --passphrase $SIGNING_PASSWORD --import
       - run: gpg --batch --pinentry-mode=loopback --passphrase $SIGNING_PASSWORD --export-secret-keys > secring.gpg
+      - run: pwd
+      - run: realpath secring.gpg
       - run: export SIGNING_SECRET_KEY_RING_FILE=&(realpath secring.gpg)
       - run: gpg --list-keys
       - run: |
