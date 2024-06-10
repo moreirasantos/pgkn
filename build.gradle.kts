@@ -15,7 +15,7 @@ plugins {
 }
 
 group = "io.github.moreirasantos"
-version = "1.2.1"
+version = file("version.txt").readText().trim()
 
 repositories {
     mavenCentral()
@@ -182,7 +182,8 @@ tasks {
         "publishMacosX64PublicationToSonatypeRepository",
         "publishJvmPublicationToSonatypeRepository",
         "publishKotlinMultiplatformPublicationToSonatypeRepository",
-        "publishLinuxX64PublicationToSonatypeRepository"
+        "publishLinuxX64PublicationToSonatypeRepository",
+        "publishLinuxArm64PublicationToSonatypeRepository"
     ).forEach { findByName(it)?.dependencies() }
 
 }

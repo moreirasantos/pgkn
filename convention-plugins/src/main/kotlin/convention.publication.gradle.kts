@@ -23,6 +23,7 @@ if (secretPropsFile.exists()) {
         ext[name.toString()] = value
     }
 } else {
+    println("Skipping local.properties")
     ext["signing.keyId"] = System.getenv("SIGNING_KEY_ID")
     ext["signing.password"] = System.getenv("SIGNING_PASSWORD")
     ext["signing.secretKeyRingFile"] = System.getenv("SIGNING_SECRET_KEY_RING_FILE")
