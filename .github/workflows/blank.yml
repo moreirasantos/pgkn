@@ -30,7 +30,7 @@ jobs:
           java-version: '17'
           cache: 'gradle'
       - run: gradle wrapper --no-daemon
-      - run: ./gradlew build -x check --no-daemon -Ptargets=macosArm64
+      - run: ./gradlew build -x check --no-daemon
       - name: Archive build artifacts
         uses: actions/upload-artifact@v4
         with:
