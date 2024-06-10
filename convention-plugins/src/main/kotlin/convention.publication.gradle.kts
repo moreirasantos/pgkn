@@ -15,6 +15,7 @@ ext["ossrhPassword"] = null
 // Grabbing secrets from local.properties file or from environment variables, which could be used on CI
 val secretPropsFile = project.rootProject.file("local.properties")
 if (secretPropsFile.exists()) {
+    println("Using local.properties")
     secretPropsFile.reader().use {
         Properties().apply {
             load(it)
@@ -23,11 +24,13 @@ if (secretPropsFile.exists()) {
         ext[name.toString()] = value
     }
 } else {
+    println("Skipping local.properties")
     ext["signing.keyId"] = System.getenv("SIGNING_KEY_ID")
     ext["signing.password"] = System.getenv("SIGNING_PASSWORD")
     ext["signing.secretKeyRingFile"] = System.getenv("SIGNING_SECRET_KEY_RING_FILE")
     ext["ossrhUsername"] = System.getenv("OSSRH_USERNAME")
     ext["ossrhPassword"] = System.getenv("OSSRH_PASSWORD")
+    println(ext["signing.secretKeyRingFile"])
 }
 
 val javadocJar by tasks.registering(Jar::class) {
