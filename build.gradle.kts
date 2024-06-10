@@ -15,7 +15,7 @@ plugins {
 }
 
 group = "io.github.moreirasantos"
-version = "1.2.1"
+version = file("version.txt").readText().trim()
 
 repositories {
     mavenCentral()
