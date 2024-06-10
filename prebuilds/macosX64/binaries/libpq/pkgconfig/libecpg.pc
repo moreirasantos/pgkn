@@ -1,0 +1,14 @@
+prefix=/usr/local/Cellar/libpq/16.2_1
+exec_prefix=${prefix}
+libdir=/usr/local/opt/libpq/lib
+includedir=/usr/local/opt/libpq/include
+
+Name: libecpg
+Description: PostgreSQL libecpg library
+URL: https://www.postgresql.org/
+Version: 16.2
+Requires: 
+Requires.private: libpq, libpgtypes
+Cflags: -I${includedir}
+Libs: -L${libdir} -lecpg
+Libs.private:  -lpgcommon -lpgport -lpq -lm

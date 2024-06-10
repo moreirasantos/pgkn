@@ -81,14 +81,9 @@ the `linuxX64` and `linuxArm64` targets, you can do:
 ./gradlew build -Ptargets=linuxX64,linuxArm64
 ```
 
+### Prebuilds
+
+This project uses prebuilds to compile for each target, so no `libpq` installation is needed.  
+These prebuilds were pulled from `brew`. Currently, we're using version 16 of `libpq`.
+
 ## FAQ
-
-### Two HomeBrews
-
-TODO - clarify this better:
-
-1. https://stackoverflow.com/questions/64951024/how-can-i-run-two-isolated-installations-of-homebrew
-2. Two homebrews is good for macosarm and macosX, but it isn't enough for linuxX64
-3. For linuxX64 I had to brew install libpq in linux and copy over the files to macos
-4. https://discuss.kotlinlang.org/t/how-to-determine-linkeropts-at-build-time/17402/2
-5. https://github.com/JetBrains/kotlin-native/issues/1534

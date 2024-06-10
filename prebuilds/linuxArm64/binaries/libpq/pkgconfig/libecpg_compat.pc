@@ -1,0 +1,14 @@
+prefix=/opt/homebrew/Cellar/libpq/16.2_1
+exec_prefix=${prefix}
+libdir=/opt/homebrew/opt/libpq/lib
+includedir=/opt/homebrew/opt/libpq/include
+
+Name: libecpg_compat
+Description: PostgreSQL libecpg_compat library
+URL: https://www.postgresql.org/
+Version: 16.2
+Requires: 
+Requires.private: libecpg, libpgtypes
+Cflags: -I${includedir}
+Libs: -L${libdir} -lecpg_compat
+Libs.private:  -lecpg -lpgcommon -lpgport -lpq -lm

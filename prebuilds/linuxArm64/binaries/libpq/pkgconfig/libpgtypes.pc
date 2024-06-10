@@ -1,0 +1,14 @@
+prefix=/opt/homebrew/Cellar/libpq/16.2_1
+exec_prefix=${prefix}
+libdir=/opt/homebrew/opt/libpq/lib
+includedir=/opt/homebrew/opt/libpq/include
+
+Name: libpgtypes
+Description: PostgreSQL libpgtypes library
+URL: https://www.postgresql.org/
+Version: 16.2
+Requires: 
+Requires.private: 
+Cflags: -I${includedir}
+Libs: -L${libdir} -lpgtypes
+Libs.private:  -lpgcommon -lpgport -lm

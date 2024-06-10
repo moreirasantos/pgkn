@@ -1,0 +1,6 @@
+headers = libpq-fe.h
+headerFilter = *
+package = libpq
+
+compilerOpts = -I./prebuilds/macosX64/headers/libpq -I/usr/local/opt/libpq/include
+linkerOpts = -L./prebuilds/macosX64/binaries/libpq -L/usr/local/opt/libpq/lib -lpq
