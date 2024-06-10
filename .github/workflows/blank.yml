@@ -18,9 +18,6 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
           cache: 'gradle'
-      - name: Set up Homebrew
-        uses: Homebrew/actions/setup-homebrew@master
-      - run: brew install libpq
       - run: gradle wrapper --no-daemon
       - run: ./gradlew build detekt --no-daemon -Ptargets=linuxX64
   build:
@@ -32,9 +29,6 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
           cache: 'gradle'
-      - name: Set up Homebrew
-        uses: Homebrew/actions/setup-homebrew@master
-      - run: brew install libpq
       - run: gradle wrapper --no-daemon
       - run: ./gradlew build -x check --no-daemon -Ptargets=macosArm64
       - name: Archive build artifacts
